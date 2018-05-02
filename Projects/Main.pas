@@ -2,7 +2,7 @@ unit Main;
 
 {
   Inno Setup
-  Copyright (C) 1997-2016 Jordan Russell
+  Copyright (C) 1997-2018 Jordan Russell
   Portions by Martijn Laan
   For conditions of distribution and use, see LICENSE.TXT.
 
@@ -131,8 +131,8 @@ var
   SetupHeader: TSetupHeader;
   LangOptions: TSetupLanguageEntry;
   Entries: array[TEntryType] of TList;
-  WizardImage: TBitmap;
-  WizardSmallImage: TBitmap;
+  WizardImages: TList;
+  WizardSmallImages: TList;
   CloseApplicationsFilterList: TStringList;
 
   { User options }
@@ -180,6 +180,8 @@ var
 
   CodeRunner: TScriptRunner;
 
+procedure CodeRunnerOnLog(const S: String);
+procedure CodeRunnerOnLogFmt(const S: String; const Args: array of const);
 function CodeRunnerOnDebug(const Position: LongInt;
   var ContinueStepOver: Boolean): Boolean;
 function CodeRunnerOnDebugIntermediate(const Position: LongInt;
@@ -2038,6 +2040,16 @@ begin
   DebugNotify(Kind, Integer(OriginalEntryIndexes[EntryType][Number]), B);
 end;
 
+procedure CodeRunnerOnLog(const S: String);
+begin
+  Log(S);
+end;
+
+procedure CodeRunnerOnLogFmt(const S: String; const Args: array of const);
+begin
+  LogFmt(S, Args);
+end;
+
 procedure CodeRunnerOnDllImport(var DllName: String; var ForceDelayLoad: Boolean);
 var
   S, BaseName, FullName: String;
@@ -2551,7 +2563,7 @@ var
     end;
   end;
 
-  procedure ReadWizardImage(var WizardImage: TBitmap; const R: TCompressedBlockReader);
+  function ReadWizardImage(const R: TCompressedBlockReader): TBitmap;
   var
     MemStream: TMemoryStream;
   begin
@@ -2559,9 +2571,9 @@ var
     try
       ReadFileIntoStream(MemStream, R);
       MemStream.Seek(0, soFromBeginning);
-      WizardImage := TAlphaBitmap.Create;
-      TAlphaBitmap(WizardImage).AlphaFormat := TAlphaFormat(SetupHeader.WizardImageAlphaFormat);
-      WizardImage.LoadFromStream(MemStream);
+      Result := TAlphaBitmap.Create;
+      TAlphaBitmap(Result).AlphaFormat := TAlphaFormat(SetupHeader.WizardImageAlphaFormat);
+      Result.LoadFromStream(MemStream);
     finally
       MemStream.Free;
     end;
@@ -2739,7 +2751,7 @@ var
 var
   ParamName, ParamValue: String;
   StartParam: Integer;
-  I: Integer;
+  I, N: Integer;
   IsRespawnedProcess, EnableLogging, WantToSuppressMsgBoxes, Res: Boolean;
   DebugWndValue: HWND;
   LogFilename: String;
@@ -3021,8 +3033,13 @@ begin
           Integer(@PSetupRunEntry(nil).OnlyBelowVersion));
 
         { Wizard image }
-        ReadWizardImage(WizardImage, Reader);
-        ReadWizardImage(WizardSmallImage, Reader);
+
+        Reader.Read(N, SizeOf(LongInt));
+        for I := 0 to N-1 do
+          WizardImages.Add(ReadWizardImage(Reader));
+        Reader.Read(N, SizeOf(LongInt));
+        for I := 0 to N-1 do
+          WizardSmallImages.Add(ReadWizardImage(Reader));
         { Decompressor DLL }
         DecompressorDLL := nil;
         if SetupHeader.CompressMethod in [cmZip, cmBzip] then begin
@@ -3136,6 +3153,8 @@ begin
   if SetupHeader.CompiledCodeText <> '' then begin
     CodeRunner := TScriptRunner.Create();
     try
+      CodeRunner.OnLog := CodeRunnerOnLog;
+      CodeRunner.OnLogFmt := CodeRunnerOnLogFmt;
       CodeRunner.OnDllImport := CodeRunnerOnDllImport;
       CodeRunner.OnDebug := CodeRunnerOnDebug;
       CodeRunner.OnDebugIntermediate := CodeRunnerOnDebugIntermediate;
@@ -3475,7 +3494,10 @@ begin
     Application.ShowMainForm := False;
   end;
 
-  Caption := FmtSetupMessage1(msgSetupWindowTitle, ExpandedAppName);
+  if shDisableWelcomePage in SetupHeader.Options then
+    Caption := FmtSetupMessage1(msgSetupWindowTitle, ExpandedAppVerName)
+  else
+    Caption := FmtSetupMessage1(msgSetupWindowTitle, ExpandedAppName);
 
   { Append the 'About Setup' item to the system menu }
   SystemMenu := GetSystemMenu(Handle, False);
@@ -3604,8 +3626,8 @@ begin
   S := SetupTitle + ' version ' + SetupVersion + SNewLine;
   if SetupTitle <> 'Inno Setup' then
     S := S + (SNewLine + 'Based on Inno Setup' + SNewLine);
-  S := S + ('Copyright (C) 1997-2016 Jordan Russell' + SNewLine +
-    'Portions Copyright (C) 2000-2016 Martijn Laan' + SNewLine +
+  S := S + ('Copyright (C) 1997-2018 Jordan Russell' + SNewLine +
+    'Portions Copyright (C) 2000-2018 Martijn Laan' + SNewLine +
     'All rights reserved.' + SNewLine2 +
     'Inno Setup home page:' + SNewLine +
     'http://www.innosetup.com/');
@@ -4193,6 +4215,7 @@ const
   PROCESSOR_ARCHITECTURE_INTEL = 0;
   PROCESSOR_ARCHITECTURE_IA64 = 6;
   PROCESSOR_ARCHITECTURE_AMD64 = 9;
+  PROCESSOR_ARCHITECTURE_ARM64 = 12;
 var
   KernelModule: HMODULE;
   GetNativeSystemInfoFunc: procedure(var lpSystemInfo: TSystemInfo); stdcall;
@@ -4219,10 +4242,10 @@ begin
     IsWow64ProcessFunc := GetProcAddress(KernelModule, 'IsWow64Process');
     if Assigned(IsWow64ProcessFunc) and
        IsWow64ProcessFunc(GetCurrentProcess, Wow64Process) and
-       Wow64Process then begin
+      Wow64Process then begin
       if AreFsRedirectionFunctionsAvailable and
          (GetProcAddress(KernelModule, 'GetSystemWow64DirectoryA') <> nil) and
-         (GetProcAddress(GetModuleHandle(advapi32), 'RegDeleteKeyExA') <> nil) then
+        (GetProcAddress(GetModuleHandle(advapi32), 'RegDeleteKeyExA') <> nil) then
         IsWin64 := True;
     end;
   end
@@ -4233,6 +4256,7 @@ begin
     PROCESSOR_ARCHITECTURE_INTEL: ProcessorArchitecture := paX86;
     PROCESSOR_ARCHITECTURE_IA64: ProcessorArchitecture := paIA64;
     PROCESSOR_ARCHITECTURE_AMD64: ProcessorArchitecture := paX64;
+    PROCESSOR_ARCHITECTURE_ARM64: ProcessorArchitecture := paARM64;
   else
     ProcessorArchitecture := paUnknown;
   end;
@@ -4355,6 +4379,18 @@ begin
   end;
 end;
 
+procedure FreeWizardImages;
+var
+  I: Integer;
+begin
+  for I := WizardImages.Count-1 downto 0 do
+    TBitmap(WizardImages[I]).Free;
+  FreeAndNil(WizardImages);
+  for I := WizardSmallImages.Count-1 downto 0 do
+    TBitmap(WizardSmallImages[I]).Free;
+  FreeAndNil(WizardSmallImages);
+end;
+
 initialization
   IsNT := UsingWinNT;
   InitIsWin64AndProcessorArchitecture;
@@ -4372,12 +4408,13 @@ initialization
   DeleteFilesAfterInstallList := TStringList.Create;
   DeleteDirsAfterInstallList := TStringList.Create;
   CloseApplicationsFilterList := TStringList.Create;
+  WizardImages := TList.Create;
+  WizardSmallImages := TList.Create;
   SHGetKnownFolderPathFunc := GetProcAddress(SafeLoadLibrary(AddBackslash(GetSystemDir) + shell32,
     SEM_NOOPENFILEERRORBOX), 'SHGetKnownFolderPath');
 
 finalization
-  FreeAndNil(WizardImage);
-  FreeAndNil(WizardSmallImage);
+  FreeWizardImages;
   FreeAndNil(CloseApplicationsFilterList);
   FreeAndNil(DeleteDirsAfterInstallList);
   FreeAndNil(DeleteFilesAfterInstallList);

@@ -1,5 +1,5 @@
 ; Inno Setup
-; Copyright (C) 1997-2012 Jordan Russell. All rights reserved.
+; Copyright (C) 1997-2018 Jordan Russell. All rights reserved.
 ; Portions by Martijn Laan
 ; For conditions of distribution and use, see LICENSE.TXT.
 ;
@@ -8,12 +8,12 @@
 [Setup]
 AppName=Inno Setup
 AppId=Inno Setup 5
-AppVersion=5.5.9
+AppVersion=5.6.0
 AppPublisher=jrsoftware.org
 AppPublisherURL=http://www.innosetup.com/
 AppSupportURL=http://www.innosetup.com/
 AppUpdatesURL=http://www.innosetup.com/
-VersionInfoCopyright=Copyright (C) 1997-2012 Jordan Russell. Portions Copyright (C) 2000-2012 Martijn Laan.
+VersionInfoCopyright=Copyright (C) 1997-2018 Jordan Russell. Portions Copyright (C) 2000-2018 Martijn Laan.
 AppMutex=InnoSetupCompilerAppMutex,Global\InnoSetupCompilerAppMutex
 SetupMutex=InnoSetupCompilerSetupMutex,Global\InnoSetupCompilerSetupMutex
 MinVersion=0,5.0
@@ -74,6 +74,7 @@ Name: fileassoc; Description: "{cm:AssocFileExtension,Inno Setup,.iss}"
 ; Remove Unicode-only files if needed
 #ifndef UNICODE
 Type: files; Name: "{app}\Languages\*.islu"
+Type: files; Name: "{app}\Examples\UnicodeExample1.iss"
 #endif
 ; Remove ISPP files if needed (leave ISPP.chm)
 Type: files; Name: "{app}\ISPP.dll"; Check: not ISPPCheck
@@ -143,6 +144,9 @@ Source: "Examples\CodeDll.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion 
 Source: "Examples\CodeAutomation.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
 Source: "Examples\CodeAutomation2.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
 Source: "Examples\CodePrepareToInstall.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
+#ifdef UNICODE
+Source: "Examples\UnicodeExample1.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
+#endif
 Source: "Examples\UninstallCodeExample1.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
 Source: "Examples\MyDll.dll"; DestDir: "{app}\Examples"; Flags: ignoreversion signonce touch
 Source: "Examples\MyDll\C\MyDll.c"; DestDir: "{app}\Examples\MyDll\C"; Flags: ignoreversion touch
