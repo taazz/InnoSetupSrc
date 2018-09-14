@@ -8,7 +8,7 @@
 [Setup]
 AppName=Inno Setup
 AppId=Inno Setup 5
-AppVersion=5.6.0
+AppVersion=5.6.1
 AppPublisher=jrsoftware.org
 AppPublisherURL=http://www.innosetup.com/
 AppSupportURL=http://www.innosetup.com/
@@ -16,7 +16,6 @@ AppUpdatesURL=http://www.innosetup.com/
 VersionInfoCopyright=Copyright (C) 1997-2018 Jordan Russell. Portions Copyright (C) 2000-2018 Martijn Laan.
 AppMutex=InnoSetupCompilerAppMutex,Global\InnoSetupCompilerAppMutex
 SetupMutex=InnoSetupCompilerSetupMutex,Global\InnoSetupCompilerSetupMutex
-MinVersion=0,5.0
 DefaultDirName={pf}\Inno Setup 5
 DefaultGroupName=Inno Setup 5
 AllowNoIcons=yes
@@ -36,34 +35,55 @@ SignTool=issigntool256
 SignedUninstaller=yes
 #endif
 
-[Languages]
-Name: english; MessagesFile: "files\Default.isl"
+#define MatchingExtension(str FileName, str Extension) \
+  SameText(ExtractFileExt(FileName), Extension)
 
-#sub ProcessFoundFile
+#sub ProcessFoundLanguagesFile
   #define FileName FindGetFileName(FindHandle)
-  #define Name LowerCase(RemoveFileExt(FileName))
-  #define MessagesFile PathName + FileName
-  #pragma message "Generating [Languages] entry with name " + Name
-  Name: {#Name}; MessagesFile: {#MessagesFile}
+  #if MatchingExtension(FileName, FindBaseExtension) ; Some systems also return .islu files when asked for *.isl
+    #define Name LowerCase(RemoveFileExt(FileName))
+    #define MessagesFile FindPathName + FileName
+    #define CustomMessagesFile FindPathName + 'Setup\' + Name + '.' + FindBaseExtension
+    #pragma message "Generating [Languages] entry with name " + Name + ": " + MessagesFile + ', ' + CustomMessagesFile
+    #if FileExists(CustomMessagesFile)
+      Name: {#Name}; MessagesFile: "{#MessagesFile},{#CustomMessagesFile}"
+    #else
+      Name: {#Name}; MessagesFile: "{#MessagesFile}"
+    #endif
+  #endif
 #endsub
 
-#define PathName "files\Languages\"
+#define FindPathName
+#define FindBaseExtension
 #define FindHandle
 #define FindResult
 
-#for {FindHandle = FindResult = FindFirst(PathName + "*.isl", 0); FindResult; FindResult = FindNext(FindHandle)} ProcessFoundFile
-#if FindHandle
-  #expr FindClose(FindHandle)
-#endif
-#ifdef UNICODE
-  #for {FindHandle = FindResult = FindFirst(PathName + "*.islu", 0); FindResult; FindResult = FindNext(FindHandle)} ProcessFoundFile
+#sub DoFindFilesLoop
+  #for {FindHandle = FindResult = FindFirst(FindPathName + "*." + FindBaseExtension, 0); FindResult; FindResult = FindNext(FindHandle)} ProcessFoundLanguagesFile
   #if FindHandle
     #expr FindClose(FindHandle)
   #endif
-#endif
+#endsub
+
+#sub DoFindFiles
+  #expr DoFindFilesLoop
+  #ifdef UNICODE
+    #expr FindBaseExtension = FindBaseExtension + "u"
+    #expr DoFindFilesLoop
+  #endif
+#endsub
+
+#define FindFiles(str PathName, str BaseExtension) \
+  FindPathName = PathName, FindBaseExtension = BaseExtension, \
+  DoFindFiles
+
+[Languages]
+Name: english; MessagesFile: "files\Default.isl,files\Languages\Setup\Default.isl"
+; Generate [Languages] entries for all official translations
+#expr FindFiles("files\Languages\", "isl")
 
 [Messages]
-; two "Setup" on the same line looks weird, so put a line break in between
+; Two "Setup" on the same line looks weird, so put a line break in between
 english.WelcomeLabel1=Welcome to the Inno Setup%nSetup Wizard
 
 [Tasks]
@@ -76,19 +96,15 @@ Name: fileassoc; Description: "{cm:AssocFileExtension,Inno Setup,.iss}"
 Type: files; Name: "{app}\Languages\*.islu"
 Type: files; Name: "{app}\Examples\UnicodeExample1.iss"
 #endif
-; Remove ISPP files if needed (leave ISPP.chm)
-Type: files; Name: "{app}\ISPP.dll"; Check: not ISPPCheck
-Type: files; Name: "{app}\ISPPBuiltins.iss"; Check: not ISPPCheck
 ; Remove old ISPP files
 Type: files; Name: "{app}\ISCmplr.dls"
 Type: files; Name: "{app}\Builtins.iss"
-; Older versions created the desktop icon under {userdesktop}
-Type: files; Name: "{userdesktop}\Inno Setup Compiler.lnk"
+; Remove desktop icon if needed
+Type: files; Name: {commondesktop}\Inno Setup Compiler.lnk; Tasks: not desktopicon
+; Remove old FAQ file
+Type: files; Name: "{app}\isfaq.htm"
 
 [Files]
-; Files used by [Code] first so these can be quickly decompressed despite solid compression
-Source: "files\ISPP.ico"; Flags: dontcopy
-; Other files
 Source: "license.txt"; DestDir: "{app}"; Flags: ignoreversion touch
 Source: "ishelp\Staging\ISetup.chm"; DestDir: "{app}"; Flags: ignoreversion touch
 Source: "files\Compil32.exe"; DestDir: "{app}"; Flags: ignoreversion signonce touch
@@ -123,7 +139,6 @@ Source: "files\{#islzmadll}"; DestName: "islzma.dll"; DestDir: "{app}"; Flags: i
 Source: "files\islzma32.exe"; DestDir: "{app}"; Flags: ignoreversion signonce touch
 Source: "files\islzma64.exe"; DestDir: "{app}"; Flags: ignoreversion signonce touch
 Source: "whatsnew.htm"; DestDir: "{app}"; Flags: ignoreversion touch
-Source: "ishelp\isfaq.htm"; DestDir: "{app}"; Flags: ignoreversion touch
 Source: "Examples\Example1.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
 Source: "Examples\Example2.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
 Source: "Examples\Example3.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
@@ -160,19 +175,24 @@ Source: "Examples\MyDll\C#\Properties\AssemblyInfo.cs"; DestDir: "{app}\Examples
 Source: "Examples\MyDll\Delphi\MyDll.dpr"; DestDir: "{app}\Examples\MyDll\Delphi"; Flags: ignoreversion touch
 Source: "Examples\ISPPExample1.iss"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
 Source: "Examples\ISPPExample1License.txt"; DestDir: "{app}\Examples"; Flags: ignoreversion touch
-; ISPP files
 Source: "Projects\ISPP\Help\Staging\ISPP.chm"; DestDir: "{app}"; Flags: ignoreversion touch
 #ifndef isppdll
   #define isppdll "ispp.dll"
 #endif
-Source: "files\{#isppdll}"; DestName: "ISPP.dll"; DestDir: "{app}"; Flags: ignoreversion signonce touch; Check: ISPPCheck
-Source: "files\ISPPBuiltins.iss"; DestDir: "{app}"; Flags: ignoreversion touch; Check: ISPPCheck
+Source: "files\{#isppdll}"; DestName: "ISPP.dll"; DestDir: "{app}"; Flags: ignoreversion signonce touch
+Source: "files\ISPPBuiltins.iss"; DestDir: "{app}"; Flags: ignoreversion touch
+
+[INI]
+Filename: "{app}\isfaq.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.jrsoftware.org/isfaq.php" 
+
+[UninstallDelete]
+Type: files; Name: "{app}\isfaq.url"
 
 [Icons]
 Name: "{group}\Inno Setup Compiler"; Filename: "{app}\Compil32.exe"; WorkingDir: "{app}"; AppUserModelID: "JR.InnoSetup.IDE.5"
 Name: "{group}\Inno Setup Documentation"; Filename: "{app}\ISetup.chm"
 Name: "{group}\Inno Setup Example Scripts"; Filename: "{app}\Examples\"
-Name: "{group}\Inno Setup FAQ"; Filename: "{app}\isfaq.htm"
+Name: "{group}\Inno Setup FAQ"; Filename: "{app}\isfaq.url"
 Name: "{group}\Inno Setup Revision History"; Filename: "{app}\whatsnew.htm"
 Name: "{commondesktop}\Inno Setup Compiler"; Filename: "{app}\Compil32.exe"; WorkingDir: "{app}"; AppUserModelID: "JR.InnoSetup.IDE.5"; Tasks: desktopicon
 
@@ -183,129 +203,7 @@ Filename: "{app}\Compil32.exe"; WorkingDir: "{app}"; Description: "{cm:LaunchPro
 [UninstallRun]
 Filename: "{app}\Compil32.exe"; Parameters: "/UNASSOC"; RunOnceId: "RemoveISSAssoc"
 
-[CustomMessages]
-ISPPTitle=Inno Setup Preprocessor
-ISPPSubtitle=Would you like to install Inno Setup Preprocessor?
-ISPPText=Inno Setup Preprocessor (ISPP) is an official add-on for Inno Setup. ISPP allows you to conditionally compile parts of scripts, to use compile time variables in your scripts and to use built-in functions which for example can read from the registry or INI files at compile time.%n%nISPP also contains a special version of the ISCC command line compiler which can take variable definitions as command line parameters and use them during compilation.
-ISPPText2=Select whether you would like to install ISPP, then click Next.
-ISPPCheck=&Install Inno Setup Preprocessor
-
 [Code]
-var
-  ISPPPage: TWizardPage;
-  ISPPCheckBox: TCheckBox;
-  
-function GetModuleHandle(lpModuleName: LongInt): LongInt;
-external 'GetModuleHandleA@kernel32.dll stdcall';
-function ExtractIcon(hInst: LongInt; lpszExeFileName: AnsiString; nIconIndex: LongInt): LongInt;
-external 'ExtractIconA@shell32.dll stdcall';
-function DrawIconEx(hdc: LongInt; xLeft, yTop: Integer; hIcon: LongInt; cxWidth, cyWidth: Integer; istepIfAniCur: LongInt; hbrFlickerFreeDraw, diFlags: LongInt): LongInt;
-external 'DrawIconEx@user32.dll stdcall';
-function DestroyIcon(hIcon: LongInt): LongInt;
-external 'DestroyIcon@user32.dll stdcall';
-
-const
-  DI_NORMAL = 3;
-  
-function CreateCustomOptionPage(AAfterId: Integer; ACaption, ASubCaption, AIconFileName, ALabel1Caption, ALabel2Caption,
-  ACheckCaption: String; var CheckBox: TCheckBox): TWizardPage;
-var
-  Page: TWizardPage;
-  Rect: TRect;
-  hIcon: LongInt;
-  Label1, Label2: TNewStaticText;
-begin
-  Page := CreateCustomPage(AAfterID, ACaption, ASubCaption);
-  
-  try
-    AIconFileName := ExpandConstant('{tmp}\' + AIconFileName);
-    if not FileExists(AIconFileName) then
-      ExtractTemporaryFile(ExtractFileName(AIconFileName));
-
-    Rect.Left := 0;
-    Rect.Top := 0;
-    Rect.Right := 32;
-    Rect.Bottom := 32;
-
-    hIcon := ExtractIcon(GetModuleHandle(0), AIconFileName, 0);
-    try
-      with TBitmapImage.Create(Page) do begin
-        with Bitmap do begin
-          Width := 32;
-          Height := 32;
-          Canvas.Brush.Color := WizardForm.Color;
-          Canvas.FillRect(Rect);
-          DrawIconEx(Canvas.Handle, 0, 0, hIcon, 32, 32, 0, 0, DI_NORMAL);
-        end;
-        Parent := Page.Surface;
-      end;
-    finally
-      DestroyIcon(hIcon);
-    end;
-  except
-  end;
-
-  Label1 := TNewStaticText.Create(Page);
-  with Label1 do begin
-    AutoSize := False;
-    Left := WizardForm.SelectDirLabel.Left;
-    Width := Page.SurfaceWidth - Left;
-    WordWrap := True;
-    Caption := ALabel1Caption;
-    Parent := Page.Surface;
-  end;
-  WizardForm.AdjustLabelHeight(Label1);
-
-  Label2 := TNewStaticText.Create(Page);
-  with Label2 do begin
-    Top := Label1.Top + Label1.Height + ScaleY(12);
-    Caption := ALabel2Caption;
-    Parent := Page.Surface;
-  end;
-  WizardForm.AdjustLabelHeight(Label2);
-
-  CheckBox := TCheckBox.Create(Page);
-  with CheckBox do begin
-    Top := Label2.Top + Label2.Height + ScaleY(12);
-    Width := Page.SurfaceWidth;
-    Caption := ACheckCaption;
-    Parent := Page.Surface;
-  end;
-  
-  Result := Page;
-end;
-
-procedure CreateCustomPages;
-var
-  Caption, SubCaption1, IconFileName, Label1Caption, Label2Caption, CheckCaption: String;
-begin
-  Caption := CustomMessage('ISPPTitle');
-  SubCaption1 := CustomMessage('ISPPSubtitle');
-  IconFileName := 'ISPP.ico';
-  Label1Caption := CustomMessage('ISPPText');
-  Label2Caption := CustomMessage('ISPPText2');
-  CheckCaption := CustomMessage('ISPPCheck');
-
-  ISPPPage := CreateCustomOptionPage(wpSelectProgramGroup, Caption, SubCaption1, IconFileName, Label1Caption, Label2Caption, CheckCaption, ISPPCheckBox);
-end;
-
-procedure InitializeWizard;
-begin
-  CreateCustomPages;
-  
-  ISPPCheckBox.Checked := (GetPreviousData('ISPP', '1') = '1') or (ExpandConstant('{param:ispp|0}') = '1');
-end;
-
-procedure RegisterPreviousData(PreviousDataKey: Integer);
-begin
-  SetPreviousData(PreviousDataKey, 'ISPP', IntToStr(Ord(ISPPCheckBox.Checked)));
-end;
-
-function ISPPCheck: Boolean;
-begin
-  Result := ISPPCheckBox.Checked;
-end;
-
 function PortableCheck: Boolean;
 begin
   Result := ExpandConstant('{param:portable|0}') = '1';

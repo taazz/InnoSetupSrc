@@ -62,7 +62,7 @@
     <contentstopic title="Frequently Asked Questions" topic="faq" />
     <contentstopic title="Wizard Pages" topic="wizardpages" />
     <contentstopic title="Installation Order" topic="installorder" />
-    <contentstopic title="Install Mode: 32-bit vs. 64-bit" topic="32vs64bitinstalls" />
+    <contentstopic title="64-bit Install Mode" topic="32vs64bitinstalls" />
     <contentstopic title="64-bit Installation Limitations" topic="64bitlimitations" />
     <contentstopic title="Miscellaneous Notes" topic="technotes" />
     <contentstopic title="Command Line Compiler Execution" topic="compilercmdline" />
@@ -71,7 +71,7 @@
     <contentstopic title="Uninstaller Command Line Parameters" topic="uninstcmdline" />
     <contentstopic title="Uninstaller Exit Codes" topic="uninstexitcodes" />
     <contentstopic title="Unsafe Files" topic="unsafefiles" />
-    <contentstopic title="Credits" topic="credits" />
+    <contentstopic title="Contributors" topic="credits" />
     <contentstopic title="Support Inno Setup" topic="donate" />
   </contentsheading>
 </contents>
@@ -85,14 +85,14 @@
 <body>
 
 <p>
-<b>Inno Setup version 5.6.0</b><br/>
+<b>Inno Setup version 5.6.1</b><br/>
 <b>Copyright &copy; 1997-2018 Jordan Russell. All rights reserved.</b><br/>
 <b>Portions Copyright &copy; 2000-2018 Martijn Laan. All rights reserved.</b><br/>
 <extlink href="http://www.jrsoftware.org/">Inno Setup home page</extlink>
 </p>
 
 <p><br/>
-Inno Setup is a <i>free</i> installer for Windows programs. First introduced in 1997, Inno Setup today rivals and even surpasses many commercial installers in feature set and stability.</p>
+Inno Setup is a <i>free</i> installer for Windows programs by Jordan Russell and Martijn Laan. First introduced in 1997, Inno Setup today rivals and even surpasses many commercial installers in feature set and stability.</p>
 
 <p><br/>
 <b><i>Key features:</i></b></p>
@@ -134,7 +134,13 @@ Includes integrated support for "deflate", bzip2, and 7-Zip LZMA/LZMA2 file <lin
 
 <li>Integrated <link topic="scriptintro">Pascal scripting</link> engine option for advanced run-time install and uninstall customization.</li>
 
-<li>Full source code is available (Borland Delphi 2.0-5.0 and 2009).</li>
+<li>Full source code is available (Borland Delphi 2.0-5.0 and 2009) from <extlink href="https://github.com/jrsoftware/issrc">GitHub</extlink>.</li>
+
+<li>Tiny footprint: only about 500 kB overhead with all features included and about 300 kB overhead with all features except Unicode support included.</li>
+
+<li>All features are fully documented.</li>
+
+<li>Used by <extlink href="https://code.visualstudio.com">Microsoft Visual Studio Code</extlink> and <extlink href="https://www.embarcadero.com/products/delphi">Embarcardero Delphi</extlink>.</li>
 
 </ul>
 
@@ -342,7 +348,6 @@ This " contains " embedded " quotes
 <keyword value="{pf64}" anchor="pf64" />
 <keyword value="{reg:...}" anchor="reg" />
 <keyword value="{sd}" anchor="sd" />
-<keyword value="{sendto}" anchor="sendto" />
 <keyword value="{src}" anchor="src" />
 <keyword value="{srcexe}" anchor="srcexe" />
 <keyword value="{sys}" anchor="sys" />
@@ -362,6 +367,7 @@ This " contains " embedded " quotes
 <keyword value="{username}" anchor="username" />
 <keyword value="{userpf}" anchor="userpf" />
 <keyword value="{userprograms}" anchor="userprograms" />
+<keyword value="{usersendto}" anchor="usersendto" />
 <keyword value="{userstartmenu}" anchor="userstartmenu" />
 <keyword value="{userstartup}" anchor="userstartup" />
 <keyword value="{usertemplates}" anchor="usertemplates" />
@@ -397,7 +403,7 @@ For example: If you used <tt>{win}\MYPROG.INI</tt> on an entry and the system's 
 <dd>
 <p>The system's System32 directory.<br/>
 For example: If you used <tt>{sys}\CTL3D32.DLL</tt> on an entry and the system's Windows System directory is "C:\WINDOWS\SYSTEM", Setup or Uninstall will translate it to "C:\WINDOWS\SYSTEM\CTL3D32.DLL".</p>
-<p>On 64-bit Windows, by default, the System32 path returned by this constant maps to the directory containing 32-bit system files, just like on 32-bit Windows. (This can be overridden by enabling <link topic="32vs64bitinstalls">64-bit mode</link>.)</p>
+<p>On 64-bit Windows, by default, the System32 path returned by this constant maps to the directory containing 32-bit system files, just like on 32-bit Windows. (This can be overridden by enabling <link topic="32vs64bitinstalls">64-bit install mode</link>.)</p>
 </dd>
 
 <dt><b><a name="syswow64">{syswow64}</a></b></dt>
@@ -419,7 +425,7 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 
 <dt><b><a name="pf">{pf}</a></b></dt>
 <dd>
-<p>Program Files. The path of the system's Program Files directory. <tt>{pf}</tt> is equivalent to <tt>{pf32}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit mode</link>, in which case it is equivalent to <tt>{pf64}</tt>.</p>
+<p>Program Files. The path of the system's Program Files directory. <tt>{pf}</tt> is equivalent to <tt>{pf32}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit install mode</link>, in which case it is equivalent to <tt>{pf64}</tt>.</p>
 </dd>
 
 <dt><b><a name="pf32">{pf32}</a></b></dt>
@@ -434,7 +440,7 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 
 <dt><b><a name="cf">{cf}</a></b></dt>
 <dd>
-<p>Common Files. The path of the system's Common Files directory. <tt>{cf}</tt> is equivalent to <tt>{cf32}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit mode</link>, in which case it is equivalent to <tt>{cf64}</tt>.</p>
+<p>Common Files. The path of the system's Common Files directory. <tt>{cf}</tt> is equivalent to <tt>{cf32}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit install mode</link>, in which case it is equivalent to <tt>{cf64}</tt>.</p>
 </dd>
 
 <dt><b><a name="cf32">{cf32}</a></b></dt>
@@ -470,7 +476,7 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 
 <dt><b><a name="dotnet20">{dotnet20}</a></b></dt>
 <dd>
-<p>.NET Framework version 2.0-3.5 root directory. <tt>{dotnet20}</tt> is equivalent to <tt>{dotnet2032}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit mode</link>, in which case it is equivalent to <tt>{dotnet2064}</tt>.</p>
+<p>.NET Framework version 2.0-3.5 root directory. <tt>{dotnet20}</tt> is equivalent to <tt>{dotnet2032}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit install mode</link>, in which case it is equivalent to <tt>{dotnet2064}</tt>.</p>
 <p>An exception will be raised if an attempt is made to expand this constant on a system with no .NET Framework version 2.0-3.5 present.</p>
 </dd>
 
@@ -488,7 +494,7 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 
 <dt><b><a name="dotnet40">{dotnet40}</a></b></dt>
 <dd>
-<p>.NET Framework version 4.0 and later root directory. <tt>{dotnet40}</tt> is equivalent to <tt>{dotnet4032}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit mode</link>, in which case it is equivalent to <tt>{dotnet4064}</tt>.</p>
+<p>.NET Framework version 4.0 and later root directory. <tt>{dotnet40}</tt> is equivalent to <tt>{dotnet4032}</tt> unless the install is running in <link topic="32vs64bitinstalls">64-bit install mode</link>, in which case it is equivalent to <tt>{dotnet4064}</tt>.</p>
 <p>An exception will be raised if an attempt is made to expand this constant on a system with no .NET Framework version 4.0 or later present.</p>
 </dd>
 
@@ -530,11 +536,6 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 <p>The path to the local (nonroaming) Application Data folder.</p>
 </dd>
 
-<dt><b><a name="sendto">{sendto}</a></b></dt>
-<dd>
-<p>The path to the current user's Send To folder. (There is no common Send To folder.)</p>
-</dd>
-
 <dt><b><a name="userappdata">{userappdata}</a></b> &amp; <b><a name="commonappdata">{commonappdata}</a></b></dt>
 <dd>
 <p>The path to the Application Data folder.</p>
@@ -568,6 +569,11 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 <dt><b><a name="userprograms">{userprograms}</a></b> &amp; <b><a name="commonprograms">{commonprograms}</a></b> *</dt>
 <dd>
 <p>The path to the Programs folder on the Start Menu.</p>
+</dd>
+
+<dt><b><a name="usersendto">{usersendto}</a></b></dt>
+<dd>
+<p>The path to the current user's Send To folder. (There is no common Send To folder.)</p>
 </dd>
 
 <dt><b><a name="userstartmenu">{userstartmenu}</a></b> &amp; <b><a name="commonstartmenu">{commonstartmenu}</a></b> *</dt>
@@ -783,7 +789,6 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 <param name="MinVersion">
 <p>A minimum <link topic="winvernotes">Windows version</link> for the entry to be processed. If you use "0" then the entry will never be processed. <link topic="buildnumnotes">Build numbers and/or service pack levels</link> may be included. This overrides any <tt>MinVersion</tt> directive in the script's <tt>[Setup]</tt> section.</p>
 <p>An entry without a <tt>MinVersion</tt> parameter is always processed, unless other parameters say it shouldn't be.</p>
-<p>For compatibility with previous versions of Inno Setup, separate Windows 95/98/Me and Windows NT version numbers may be specified, separated by a comma. Example: <tt>4.1,5.0</tt>. The Windows 95/98/Me version number (the first number) isn't used, however, as Inno Setup no longer supports Windows 95/98/Me.</p>
 <example>
 <pre>MinVersion: 5.1</pre>
 </example>
@@ -792,7 +797,6 @@ For example: If you used <tt>{src}\MYPROG.EXE</tt> on an entry and the user is i
 <param name="OnlyBelowVersion">
 <p>Essentially the opposite of <tt>MinVersion</tt>. Specifies the minimum <link topic="winvernotes">Windows version</link> for the entry <i>not</i> to be processed. For example, if you put <tt>6.0</tt> and the user is running Windows 2000 or XP, the entry <i>will</i> be processed, but if the user is running Windows Vista (which reports its version as 6.0) or later, it will <i>not</i> be processed. Putting "0" means there is no upper version limit. <link topic="buildnumnotes">Build numbers and/or service pack levels</link> may be included. This overrides any <tt>OnlyBelowVersion</tt> directive in the script's <tt>[Setup]</tt> section.</p>
 <p>An entry without an <tt>OnlyBelowVersion</tt> parameter is always processed, unless other parameters say it shouldn't be.</p>
-<p>For compatibility with previous versions of Inno Setup, separate Windows 95/98/Me and Windows NT version numbers may be specified, separated by a comma. Example: <tt>4.1,5.0</tt>. The Windows 95/98/Me version number (the first number) isn't used, however, as Inno Setup no longer supports Windows 95/98/Me.</p>
 <example>
 <pre>OnlyBelowVersion: 6.0</pre>
 </example>
@@ -919,10 +923,12 @@ DefaultGroupName=My Program
 <li><link topic="setup_solidcompression">SolidCompression</link></li>
 <li><link topic="setup_sourcedir">SourceDir</link></li>
 <li><link topic="setup_terminalservicesaware">TerminalServicesAware</link></li>
+<li><link topic="setup_useduserareaswarning">UsedUserAreasWarning</link></li>
 <li><link topic="setup_usesetupldr">UseSetupLdr</link></li>
 <li><link topic="setup_versioninfocompany">VersionInfoCompany</link></li>
 <li><link topic="setup_versioninfocopyright">VersionInfoCopyright</link></li>
 <li><link topic="setup_versioninfodescription">VersionInfoDescription</link></li>
+<li><link topic="setup_versioninfooriginalfilename">VersionInfoOriginalFileName</link></li>
 <li><link topic="setup_versioninfoproductname">VersionInfoProductName</link></li>
 <li><link topic="setup_versioninfoproducttextversion">VersionInfoProductTextVersion</link></li>
 <li><link topic="setup_versioninfoproductversion">VersionInfoProductVersion</link></li>
@@ -1541,7 +1547,7 @@ ExternalSize: 1048576; Flags: external
 <p>Tells Setup the file is a font that needs to be installed. The value of this parameter is the name of the font as stored in the registry or WIN.INI. This must be exactly the same name as you see when you double-click the font file in Explorer. Note that Setup will automatically append " (TrueType)" to the end of the name.</p>
 <p>If the file is not a TrueType font, you must specify the flag <tt>fontisnttruetype</tt> in the Flags parameter.</p>
 <p>It's recommended that you use the flags <tt>onlyifdoesntexist</tt> and <tt>uninsneveruninstall</tt> when installing fonts to the {fonts} directory.</p>
-<p>To successfully install a font, the user must be a member of the Power Users or Administrators groups.</p>
+<p>To successfully install a font, the user must be a member of the Administrators groups.</p>
 <p>For compatibility with 64-bit Windows, fonts should not be installed to the <tt>{sys}</tt> directory. Use <tt>{fonts}</tt> as the destination directory instead.</p>
 <example>
 <pre>Source: "OZHANDIN.TTF"; DestDir: "{fonts}"; FontInstall: "Oz Handicraft BT"; Flags: onlyifdoesntexist uninsneveruninstall</pre>
@@ -1561,10 +1567,10 @@ ExternalSize: 1048576; Flags: external
 
 <flaglist>
 <flag name="32bit">
-<p>Causes the <tt>{sys}</tt> constant to map to the 32-bit System directory when used in the <tt>Source</tt> and <tt>DestDir</tt> parameters, the <tt>regserver</tt> and <tt>regtypelib</tt> flags to treat the file as 32-bit, and the <tt>sharedfile</tt> flag to update the 32-bit SharedDLLs registry key. This is the default behavior in a <link topic="32vs64bitinstalls">32-bit mode</link> install.</p>
+<p>Causes the <tt>{sys}</tt> constant to map to the 32-bit System directory when used in the <tt>Source</tt> and <tt>DestDir</tt> parameters, the <tt>regserver</tt> and <tt>regtypelib</tt> flags to treat the file as 32-bit, and the <tt>sharedfile</tt> flag to update the 32-bit SharedDLLs registry key. This is the default behavior in <link topic="32vs64bitinstalls">32-bit install mode</link>.</p>
 </flag>
 <flag name="64bit">
-<p>Causes the <tt>{sys}</tt> constant to map to the 64-bit System directory when used in the <tt>Source</tt> and <tt>DestDir</tt> parameters, the <tt>regserver</tt> and <tt>regtypelib</tt> flags to treat the file as 64-bit, and the <tt>sharedfile</tt> flag to update the 64-bit SharedDLLs registry key. This is the default behavior in a <link topic="32vs64bitinstalls">64-bit mode</link> install.</p>
+<p>Causes the <tt>{sys}</tt> constant to map to the 64-bit System directory when used in the <tt>Source</tt> and <tt>DestDir</tt> parameters, the <tt>regserver</tt> and <tt>regtypelib</tt> flags to treat the file as 64-bit, and the <tt>sharedfile</tt> flag to update the 64-bit SharedDLLs registry key. This is the default behavior in <link topic="32vs64bitinstalls">64-bit install mode</link>.</p>
 </flag>
 <flag name="allowunsafefiles">
 <p>Disables the compiler's automatic checking for <link topic="unsafefiles">unsafe files</link>. It is strongly recommended that you DO NOT use this flag, unless you are absolutely sure you know what you're doing.</p>
@@ -1644,12 +1650,12 @@ Instructs Setup to proceed to comparing time stamps if the file being installed 
 </flag>
 <flag name="regserver">
 <p>Register the DLL/OCX file. With this flag set, Setup will call the DllRegisterServer function exported by the DLL/OCX file, and the uninstaller will call DllUnregisterServer prior to removing the file. When used in combination with <tt>sharedfile</tt>, the DLL/OCX file will only be unregistered when the reference count reaches zero.</p>
-<p>On a <link topic="32vs64bitinstalls">64-bit mode</link> install, the file is assumed to be a 64-bit image and will be registered inside a 64-bit process. You can override this by specifying the <tt>32bit</tt> flag.</p>
+<p>In <link topic="32vs64bitinstalls">64-bit install mode</link>, the file is assumed to be a 64-bit image and will be registered inside a 64-bit process. You can override this by specifying the <tt>32bit</tt> flag.</p>
 <p>See the <i>Remarks</i> at the bottom of this topic for more information.</p>
 </flag>
 <flag name="regtypelib">
 <p>Register the type library (.tlb). The uninstaller will unregister the type library (unless the flag <tt>uninsneveruninstall</tt> is specified). As with the <tt>regserver</tt> flag, when used in combination with <tt>sharedfile</tt>, the file will only be unregistered by the uninstaller when the reference count reaches zero.</p>
-<p>On a <link topic="32vs64bitinstalls">64-bit mode</link> install running on an x64 edition of Windows, the type library will be registered inside a 64-bit process. You can override this by specifying the <tt>32bit</tt> flag.</p>
+<p>In <link topic="32vs64bitinstalls">64-bit install mode</link> running on an x64 edition of Windows, the type library will be registered inside a 64-bit process. You can override this by specifying the <tt>32bit</tt> flag.</p>
 <p>Registering type libraries in 64-bit mode on Itanium editions of Windows is not supported.</p>
 <p>See the <i>Remarks</i> at the bottom of this topic for more information.</p>
 </flag>
@@ -1668,7 +1674,7 @@ Instructs Setup to proceed to comparing time stamps if the file being installed 
 <p>Specifies that the file is shared among multiple applications, and should only be removed at uninstall time if no other applications are using it. Most files installed to the Windows System directory should use this flag, including .OCX, .BPL, and .DPL files.</p>
 <p>Windows' standard shared file reference-counting mechanism (located in the registry under HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\SharedDLLs) is used to keep track of how many applications depend on the file. Each time the file is installed, the reference count for the file is incremented. (This happens regardless of whether the installer actually replaces the file on disk.) When an application using the file is uninstalled, the reference count is decremented. If the count reaches zero, the file is deleted (with the user's confirmation, unless the <tt>uninsnosharedfileprompt</tt> flag is also specified).</p>
 <p>If Setup is run more than once, the reference count for the file will be incremented more than once. The uninstaller will decrement the reference count the same number of times, however, so no references are leaked (provided the <link topic="setup_uninstalllogmode">UninstallLogMode</link> [Setup] section directive isn't changed from its default setting of <tt>append</tt>).</p>
-<p>When this flag is used, do not specify <tt>{syswow64}</tt> in the <tt>DestDir</tt> parameter; use <tt>{sys}</tt> instead. Even though <tt>{sys}</tt> and <tt>{syswow64}</tt> map to the same underlying directory in a <link topic="32vs64bitinstalls">32-bit mode</link> install, the path name must exactly match what every other existing installer is using; otherwise, a second reference count for the file would be created, which could result in the file being removed prematurely. If you need to install a shared file to the 32-bit System directory in a <link topic="32vs64bitinstalls">64-bit mode</link> install, specify <tt>{sys}</tt> in the <tt>DestDir</tt> parameter and additionally include the <tt>32bit</tt> flag.</p>
+<p>When this flag is used, do not specify <tt>{syswow64}</tt> in the <tt>DestDir</tt> parameter; use <tt>{sys}</tt> instead. Even though <tt>{sys}</tt> and <tt>{syswow64}</tt> map to the same underlying directory in <link topic="32vs64bitinstalls">32-bit install mode</link>, the path name must exactly match what every other existing installer is using; otherwise, a second reference count for the file would be created, which could result in the file being removed prematurely. If you need to install a shared file to the 32-bit System directory in <link topic="32vs64bitinstalls">64-bit install mode</link>, specify <tt>{sys}</tt> in the <tt>DestDir</tt> parameter and additionally include the <tt>32bit</tt> flag.</p>
 </flag>
 <flag name="sign">
 <p>This flag instructs the compiler to digitally sign the original source files before storing them. Ignored if [Setup] section directive <link topic="setup_signtool">SignTool</link> is not set.</p>
@@ -1780,7 +1786,7 @@ Name: "{commonstartup}\My Program"
 <param name="Filename" required="yes">
 <p>The command line filename for the shortcut, which normally begins with a directory constant.</p>
 <p>In addition to file and folder names, URLs (web site addresses) may also be specified. When a URL is specified, Setup will create an "Internet Shortcut" (.url) file, and ignore the <tt>Parameters</tt>, <tt>WorkingDir</tt>, <tt>HotKey</tt>, and <tt>Comment</tt> parameters.</p>
-<p>On 64-bit Windows, note that the <tt>{sys}</tt> constant will map to the native 64-bit System directory when the shortcut is launched by a 64-bit process, such as Windows Explorer. This is true regardless of whether the install is running in <link topic="32vs64bitinstalls">64-bit mode</link>. To create a shortcut that always points to the 32-bit System directory, use <tt>{syswow64}</tt> instead. (The same applies to the <tt>WorkingDir</tt> and <tt>IconFilename</tt> parameters.)</p>
+<p>On 64-bit Windows, note that the <tt>{sys}</tt> constant will map to the native 64-bit System directory when the shortcut is launched by a 64-bit process, such as Windows Explorer. This is true regardless of whether the install is running in <link topic="32vs64bitinstalls">64-bit install mode</link>. To create a shortcut that always points to the 32-bit System directory, use <tt>{syswow64}</tt> instead. (The same applies to the <tt>WorkingDir</tt> and <tt>IconFilename</tt> parameters.)</p>
 <examples>
 <pre>
 Filename: "{app}\MYPROG.EXE"
@@ -2106,11 +2112,18 @@ en.ButtonNext=&amp;Forward &gt;
 
 <heading>Special-purpose IDs</heading>
 
-<p>The special-purpose <a name="BeveledLabel"><tt>BeveledLabel</tt></a> message can be used to specify a line of text that is shown in the lower left corner of the wizard window and uninstaller window. The following is an example:</p>
+<p>The <a name="BeveledLabel"><tt>BeveledLabel</tt></a> message can be used to specify a line of text that is shown in the lower left corner of the wizard window and uninstaller window. The following is an example:</p>
 
 <precode>
 [Messages]
 BeveledLabel=Inno Setup
+</precode>
+
+<p>The <tt>HelpTextNote</tt> message can be used to specify one or more lines of text that are added to the list of parameters in the summary shown when passing <link topic="setupcmdline" anchor="HELP">/HELP</link> on the command line. The following is an example:</p>
+
+<precode>
+[Messages]
+HelpTextNote=/PORTABLE=1%nEnable portable mode.
 </precode>
 
 </body>
@@ -2284,7 +2297,7 @@ Root: HKLM; Subkey: "Software\My Company\My Program\Settings"; ValueType: string
 </indent>
 <p>The values may have a suffix of <tt>32</tt> or <tt>64</tt>. Root key values with a suffix of <tt>32</tt> (for example, <tt>HKLM32</tt>) map to the 32-bit view of the registry; root key values with a suffix of <tt>64</tt> (for example, <tt>HKLM64</tt>) map to the 64-bit view of the registry.</p>
 <p>Root key values with a suffix of <tt>64</tt> can only be used when Setup is running on 64-bit Windows, otherwise an error will occur. On an installation supporting both 32- and 64-bit architectures, it is possible to avoid the error by adding a <tt>Check: IsWin64</tt> parameter, which will cause the entry to be silently skipped when running on 32-bit Windows.</p>
-<p>A root key value without a suffix (for example, <tt>HKLM</tt>) is equivalent to the value with a suffix of <tt>32</tt> (for example, <tt>HKLM32</tt>) unless the install is running in <link topic="32vs64bitinstalls">64-bit mode</link>, in which case it is equivalent to the value with a suffix of <tt>64</tt> (for example, <tt>HKLM64</tt>).</p>
+<p>A root key value without a suffix (for example, <tt>HKLM</tt>) is equivalent to the value with a suffix of <tt>32</tt> (for example, <tt>HKLM32</tt>) unless the install is running in <link topic="32vs64bitinstalls">64-bit install mode</link>, in which case it is equivalent to the value with a suffix of <tt>64</tt> (for example, <tt>HKLM64</tt>).</p>
 <example>
 <pre>Root: HKCU</pre>
 </example>
@@ -2498,11 +2511,11 @@ Filename: "{app}\MYPROG.EXE"; Description: "Launch application"; Flags: postinst
 
 <flaglist>
 <flag name="32bit">
-<p>Causes the <tt>{sys}</tt> constant to map to the 32-bit System directory when used in the <tt>Filename</tt> and <tt>WorkingDir</tt> parameters. This is the default behavior in a <link topic="32vs64bitinstalls">32-bit mode</link> install.</p>
+<p>Causes the <tt>{sys}</tt> constant to map to the 32-bit System directory when used in the <tt>Filename</tt> and <tt>WorkingDir</tt> parameters. This is the default behavior in <link topic="32vs64bitinstalls">32-bit install mode</link>.</p>
 <p>This flag cannot be combined with the <tt>shellexec</tt> flag.</p>
 </flag>
 <flag name="64bit">
-<p>Causes the <tt>{sys}</tt> constant to map to the 64-bit System directory when used in the <tt>Filename</tt> and <tt>WorkingDir</tt> parameters. This is the default behavior in a <link topic="32vs64bitinstalls">64-bit mode</link> install.</p>
+<p>Causes the <tt>{sys}</tt> constant to map to the 64-bit System directory when used in the <tt>Filename</tt> and <tt>WorkingDir</tt> parameters. This is the default behavior in <link topic="32vs64bitinstalls">64-bit install mode</link> install.</p>
 <p>This flag can only be used when Setup is running on 64-bit Windows, otherwise an error will occur. On an installation supporting both 32- and 64-bit architectures, it is possible to avoid the error by adding a <tt>Check: IsWin64</tt> parameter, which will cause the entry to be silently skipped when running on 32-bit Windows.</p>
 <p>This flag cannot be combined with the <tt>shellexec</tt> flag.</p>
 </flag>
@@ -2650,7 +2663,7 @@ Type: files; Name: "{win}\MYPROG.INI"
 <keyword value="Unicode Inno Setup" />
 <body>
 
-<p>Beginning with Inno Setup 5.3.0, there are two versions of Inno Setup available: Non Unicode Inno Setup and Unicode Inno Setup.</p>
+<p>There are two versions of Inno Setup available: Non Unicode Inno Setup and Unicode Inno Setup.</p>
 <p>Key features of Unicode Inno Setup are its ability to display any language on any system regardless of the system code page, and its ability to work with Unicode filenames. One could consider Unicode Inno Setup as the new standard Inno Setup and Non Unicode Inno Setup as an old special Inno Setup for those who want the very smallest size possible.</p>
 <p>If you don't remember which version you installed, click the "Inno Setup Compiler" shortcut created in the Start Menu. If the version number displayed in its title bar says "(a)" you are running Non Unicode Inno Setup. If it says "(u)" you are running Unicode Inno Setup.</p>
 <p>For the most part the two versions are used identically, and any differences between them are noted throughout the help file. However, the following overview lists the primary differences:</p>
@@ -2687,10 +2700,9 @@ Type: files; Name: "{win}\MYPROG.INI"
 <keyword value="file associations, creating" />
 <keyword value="Visual Basic" />
 <keyword value="BDE installation" />
-<keyword value="Y2K compliance" />
 <body>
 
-<p>The Frequently Asked Questions is now located in a separate document. Please click the "Inno Setup FAQ" shortcut created in the Start Menu when you installed Inno Setup, or open the "isfaq.htm" file in your Inno Setup directory.</p>
+<p>The Frequently Asked Questions is now located in a separate document. Please click the "Inno Setup FAQ" shortcut created in the Start Menu when you installed Inno Setup, or open the "isfaq.url" file in your Inno Setup directory.</p>
 
 <p>For the most recent Frequently Asked Questions, go to <extlink href="http://www.jrsoftware.org/isfaq.php">http://www.jrsoftware.org/isfaq.php</extlink></p>
 
@@ -2822,9 +2834,9 @@ Shown by default, but can be disabled in some cases via <link topic="setup_disab
 
 <li><link topic="runsection">[Run]</link> is processed, except for entries with the <tt>postinstall</tt> flag, which get processed after the <i>Setup Completed</i> wizard page is shown.</li>
 
-<li>If <link topic="setup_changesassociations">ChangesAssociations</link> was set to <tt>yes</tt>, file associations are refreshed now.</li>
+<li>If <link topic="setup_changesassociations">ChangesAssociations</link> was set to <tt>yes</tt> or to a <link topic="scriptexpression">boolean expression</link> evaluating to <tt>True</tt>, file associations are refreshed now.</li>
 
-<li>If <link topic="setup_changesenvironment">ChangesEnvironment</link> was set to <tt>yes</tt>, other applications are notified at this point.</li>
+<li>If <link topic="setup_changesenvironment">ChangesEnvironment</link> was set to <tt>yes</tt> or to a <link topic="scriptexpression">boolean expression</link> evaluating to <tt>True</tt>, other applications are notified at this point.</li>
 
 </ul>
 
@@ -2849,7 +2861,7 @@ Filename: "{win}\MYPROG.INI"; Section: "InstallSettings"; Key: "InstallPath"; St
 
 
 
-<topic name="32vs64bitinstalls" title="Install Mode: 32-bit vs. 64-bit">
+<topic name="32vs64bitinstalls" title="64-bit Install Mode">
 <keyword value="Install Mode: 32-bit vs. 64-bit" />
 <keyword value="32-bit install mode" />
 <keyword value="64-bit install mode" />
@@ -2858,11 +2870,11 @@ Filename: "{win}\MYPROG.INI"; Section: "InstallSettings"; Key: "InstallPath"; St
 
 <p>An installation can run in one of two modes: 32-bit or 64-bit.</p>
 
-<p>64-bit mode is selected if the user is running a 64-bit version of Windows and the system's processor architecture is included in the value of the <link topic="setup_architecturesinstallin64bitmode">ArchitecturesInstallIn64BitMode</link> [Setup] section directive. Otherwise, 32-bit mode is used.</p>
+<p>64-bit install mode is selected if the user is running a 64-bit version of Windows and the system's processor architecture is included in the value of the <link topic="setup_architecturesinstallin64bitmode">ArchitecturesInstallIn64BitMode</link> [Setup] section directive. Otherwise, 32-bit install mode is used.</p>
 
 <p>How do the two modes of installation differ? Primarily, the differences lie in where things are installed by default.</p>
 
-<p>In 32-bit mode:</p>
+<p>In 32-bit install mode:</p>
 
 <ul>
 <li>The System32 path returned by the <tt>{sys}</tt> constant maps to the 32-bit System directory by default.</li>
@@ -2877,7 +2889,7 @@ Filename: "{win}\MYPROG.INI"; Section: "InstallSettings"; Key: "InstallPath"; St
 <li>The Uninstall key is created in the 32-bit view of the registry.</li>
 </ul>
 
-<p>In 64-bit mode:</p>
+<p>In 64-bit install mode:</p>
 
 <ul>
 <li>The System32 path returned by the <tt>{sys}</tt> constant maps to the 64-bit System directory by default when used in the [Dirs], [Files], [InstallDelete], [Run], [UninstallDelete], and [UninstallRun] sections. This is because Setup/Uninstall temporarily disables <extlink href="http://msdn.microsoft.com/en-us/library/aa384187.aspx">WOW64 file system redirection</extlink> when files/directories are accessed by those sections. Elsewhere, System32 and <tt>{sys}</tt> map to the 32-bit System directory, as is normal in a 32-bit process.</li>
@@ -2906,10 +2918,10 @@ Filename: "{win}\MYPROG.INI"; Section: "InstallSettings"; Key: "InstallPath"; St
 
 <ul>
 
-<li>The System32 path returned by the <tt>{sys}</tt> constant does not always map to the 64-bit System directory. When Setup/Uninstall is running in 64-bit mode, it maps to the 64-bit System directory when used in the [Dirs], [Files], [InstallDelete], [Run], [UninstallDelete], and [UninstallRun] sections because Setup temporarily disables <extlink href="http://msdn.microsoft.com/en-us/library/aa384187.aspx">WOW64 file system redirection</extlink> when files/directories are accessed by those sections. Elsewhere, System32 and <tt>{sys}</tt> map to the 32-bit System directory, as is normal in a 32-bit process.</li>
+<li>The System32 path returned by the <tt>{sys}</tt> constant does not always map to the 64-bit System directory. When Setup/Uninstall is running in 64-bit install mode, it maps to the 64-bit System directory when used in the [Dirs], [Files], [InstallDelete], [Run], [UninstallDelete], and [UninstallRun] sections because Setup temporarily disables <extlink href="http://msdn.microsoft.com/en-us/library/aa384187.aspx">WOW64 file system redirection</extlink> when files/directories are accessed by those sections. Elsewhere, System32 and <tt>{sys}</tt> map to the 32-bit System directory, as is normal in a 32-bit process.</li>
 
 <li>
-<p>In the [Code] section, when Setup/Uninstall is running in 64-bit mode, functions that access files disable WOW64 file system redirection (unless overridden by a call to <link topic="isxfunc_EnableFsRedirection">EnableFsRedirection</link>). However, there are exceptions, listed below. These functions never disable file system redirection, meaning you cannot pass them (or get back) the name of a file located in the 64-bit System directory:</p>
+<p>In the [Code] section, when Setup/Uninstall is running in 64-bit install mode, functions that access files disable WOW64 file system redirection (unless overridden by a call to <link topic="isxfunc_EnableFsRedirection">EnableFsRedirection</link>). However, there are exceptions, listed below. These functions never disable file system redirection, meaning you cannot pass them (or get back) the name of a file located in the 64-bit System directory:</p>
 <table>
 <tr><td><tt>*Ini*</tt></td><td>(all of the functions that manipulate .INI files)</td></tr>
 <tr><td><tt>BrowseForFolder</tt></td></tr>
@@ -2950,6 +2962,10 @@ Filename: "{win}\MYPROG.INI"; Section: "InstallSettings"; Key: "InstallPath"; St
 
 <p>Optionally you could also use the <tt>skipifsilent</tt> and <tt>skipifnotsilent</tt> flags and make your application aware of a '/updated' parameter to for example show a nice message box to inform the user that the update has completed.</p>
 </li>
+
+<li>Inno Setup's own installers accept an additional /PORTABLE=1 command line parameter to enable portable mode.</li>
+
+<li>The Inno Setup backup website can be found at <extlink href="http://www.innosetup.nl/">www.innosetup.nl</extlink>. Normally this link will simply redirect you to the main website at <extlink href="http://www.jrsoftware.org/">www.jrsoftware.org</extlink> but in case of emergencies this redirect will be disabled.</li>
 
 </ul>
 
@@ -3453,9 +3469,11 @@ Keep the default set of selected tasks, but deselect the "desktopicon" task:<br/
 
 
 
-<topic name="credits" title="Credits">
-<keyword value="Credits" />
+<topic name="credits" title="Contributers">
+<keyword value="Contributers" />
 <body>
+
+<p>Inno Setup was created by Jordan Russell and is currently (since 5.4.3) maintained by Martijn Laan.</p>
 
 <p>The following is a list of those who have contributed significant code to the Inno Setup project, or otherwise deserve special recognition:</p>
 
@@ -3467,25 +3485,23 @@ Keep the default set of selected tasks, but deselect the "desktopicon" task:<br/
 
 <li>Igor Pavlov: Creator of the <extlink href="http://www.7-zip.org/sdk.html">LZMA</extlink> compression library that Inno Setup uses.</li>
 
-<li>?: Most of the disk spanning code (1.09). (Sorry, somehow your name was lost!)</li>
-
 <li>Vince Valenti: Most of the code for the "Window" <tt>[Setup]</tt> section directives (1.12.4).</li>
 
-<li>Joe White: Code for ChangesAssociations <tt>[Setup]</tt> section directive (1.2.?).</li>
+<li>Joe White: Code for ChangesAssociations <tt>[Setup]</tt> section directive (1.2).</li>
 
-<li>Jason Olsen: Most of the code for <link topic="appendnotes">appending to existing uninstall logs</link> (1.3.0).</li>
+<li>Jason Olsen: Most of the code for <link topic="appendnotes">appending to existing uninstall logs</link> (1.3).</li>
 
-<li>Martijn Laan: Code for Rich Edit 2.0 &amp; URL detection support (1.3.13); silent uninstallation (1.3.25); system image list support in drive and directory lists (1.3.25); silent installation (2.0.0); <tt>[Types]</tt>, <tt>[Components]</tt> and <tt>[Tasks]</tt> sections (2.0.0); <tt>postinstall</tt> flag (2.0.0); <tt>[Code]</tt> section (4.0.0); Subcomponents and subtasks support (4.0.0); Many other features after 4.0.0.</li>
+<li>Martijn Laan: Rich Edit 2.0 &amp; URL detection support (1.3.13); Silent uninstallation (1.3.25); System image list support in drive and directory lists (1.3.25); Silent installation (2.0); The <tt>[Types]</tt>, <tt>[Components]</tt> and <tt>[Tasks]</tt> sections (2.0); The <tt>postinstall</tt> flag (2.0); The <tt>[Code]</tt> section (4.0); Subcomponents and subtasks support (4.0); Many other features after 4.0.</li>
 
-<li>Alex Yackimoff: Portions of <link topic="scriptclasses" anchor="TNewCheckListBox">TNewCheckListBox</link> (4.0.0).</li>
+<li>Alex Yackimoff: Portions of <link topic="scriptclasses" anchor="TNewCheckListBox">TNewCheckListBox</link> (4.0).</li>
 
-<li>Carlo Kok: <extlink href="http://www.remobjects.com/ps">RemObjects Pascal Script</extlink> (4.0.0).</li>
+<li>Carlo Kok: <extlink href="http://www.remobjects.com/ps">RemObjects Pascal Script</extlink> (4.0).</li>
 
-<li>Creators of <extlink href="http://synedit.sourceforge.net/">SynEdit</extlink>: The syntax-highlighting editor used in the Compiler (2.0.0).</li>
+<li>Creators of <extlink href="http://synedit.sourceforge.net/">SynEdit</extlink>: The syntax-highlighting editor used in the Compiler (2.0 - 5.2.4).</li>
 
-<li>Creators of <extlink href="http://mh-nexus.de/en/unisynedit.php">UniSynEdit</extlink>: The syntax-highlighting editor used in the Compiler (5.3.0).</li>
+<li>Creators of <extlink href="http://mh-nexus.de/en/unisynedit.php">UniSynEdit</extlink>: The syntax-highlighting editor used in the Compiler (5.3 - 5.3.11).</li>
 
-<li>Creators of <extlink href="http://www.scintilla.org/">Scintilla</extlink>: The syntax-highlighting editor used in the Compiler (5.4.0).</li>
+<li>Creators of <extlink href="http://www.scintilla.org/">Scintilla</extlink>: The syntax-highlighting editor used in the Compiler (5.4).</li>
 
 <li><extlink href="http://www.glyfx.com/">glyFX</extlink>: The Inno Setup logo, the compiler icon, the document icon, the Inno Setup installer wizard images and the images for the IDE's toolbar. 128x128 and 256x256 icon sizes by Motaz Alnuweiri.</li>
 
@@ -3806,24 +3822,31 @@ Name: portablemode; Description: "Portable Mode"</pre></example>
 </body>
 </setuptopic>
 
+<setuptopic directive="UsedUserAreasWarning">
+<setupvalid><link topic="yesnonotes"><tt>yes</tt> or <tt>no</tt></link></setupvalid>
+<setupdefault><tt>yes</tt></setupdefault>
+<body>
+<p>This directive lets you disable the used user areas warning. See <link topic="setup_privilegesrequired">PrivilegesRequired</link> for more information.</p>
+</body>
+</setuptopic>
+
 <setuptopic directive="PrivilegesRequired">
-<setupvalid><tt>poweruser</tt>, <tt>admin</tt>, or <tt>lowest</tt></setupvalid>
+<setupvalid><tt>admin</tt>, or <tt>lowest</tt></setupvalid>
 <setupdefault><tt>admin</tt></setupdefault>
 <body>
 <p>The effect of this directive depends on which version of Windows the user is running:</p>
 <p><b>On Windows Vista and later:</b></p>
 <p>This directive affects whether elevated rights are requested (via a User Account Control dialog) when the installation is started.</p>
-<p>When set to <tt>admin</tt> (the default) or <tt>poweruser</tt>, Setup will always run with administrative privileges. If Setup was started by an unprivileged user, Windows will ask for the password to an account that has administrative privileges, and Setup will then run under that account.</p>
+<p>When set to <tt>admin</tt> (the default), Setup will always run with administrative privileges. If Setup was started by an unprivileged user, Windows will ask for the password to an account that has administrative privileges, and Setup will then run under that account.</p>
 <!-- <p>When set to <tt>none</tt>, Setup will only run with administrative privileges if it was started by a member of the Administrators group. Do not use this setting unless you are sure your installation will run successfully on unprivileged accounts.</p> -->
 <p>When set to <tt>lowest</tt>, Setup will not request to be run with administrative privileges even if it was started by a member of the Administrators group. Additionally, the uninstall info root key will always be HKEY_CURRENT_USER, and the "common" forms of the Shell Folder constants are mapped to the "user" forms, even if administrative privileges are available. Do not use this setting unless you are sure your installation will run successfully on unprivileged accounts.</p>
 <p><b>On earlier versions of Windows:</b></p>
 <p>This directive specifies the minimum user privileges required to run the installation.</p>
 <p>When set to <tt>admin</tt> (the default), Setup will only run if the user is a member of the Administrators group. Otherwise, it will display the following message and exit: "You must be logged in as an administrator when installing this program."</p>
-<p>When set to <tt>poweruser</tt>, Setup will only run if the user is a member of the Administrators or Power Users groups. Otherwise, it will display the following message and exit: "You must be logged in as an administrator or as a member of the Power Users group when installing this program."</p>
 <!-- <p>When set to <tt>none</tt> Setup will not check the user's group membership. Do not use this setting unless you are sure your installation will run successfully on unprivileged accounts.</p> -->
 <p>When set to <tt>lowest</tt> Setup will not check the user's group membership. Additionally, the uninstall info root key will always be HKEY_CURRENT_USER, and the "common" forms of the Shell Folder constants are mapped to the "user" forms, even if administrative privileges are available. Do not use this setting unless you are sure your installation will run successfully on unprivileged accounts.</p>
 <p><b>Note:</b></p>
-<p>Regardless of the version of Windows, only if the installation is per-user (<tt>PrivilegesRequired=lowest</tt>) you may touch Windows' per-user areas from your script.</p>
+<p>Regardless of the version of Windows, if the installation is administrative (<tt>PrivilegesRequired=admin</tt>) then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. The compiler will warn you about this, which can be disabled using <link topic="setup_useduserareaswarning">UsedUserAreasWarning</link>.</p>
 </body>
 </setuptopic>
 
@@ -4128,7 +4151,6 @@ UninstallDisplayIcon={app}\MyProg.exe,1
 <setuptopic directive="UninstallDisplayName">
 <body>
 <p>This lets you specify a custom name for the program's entry in the <i>Add/Remove Programs</i> Control Panel applet. The value may include constants. If this directive is not specified or is blank, Setup will use the value of <tt>[Setup]</tt> section directive <tt>AppVerName</tt> for the name.</p>
-<p>Due to limitations of Windows 95/98/Me's <i>Add/Remove Programs</i> Control Panel applet, the value of <tt>UninstallDisplayName</tt> will be trimmed if it exceeds 63 characters.</p>
 <example><pre>UninstallDisplayName=My Program</pre></example>
 </body>
 </setuptopic>
@@ -4368,19 +4390,19 @@ DiskSliceSize=1457664
 </setuptopic>
 
 <setuptopic directive="ChangesAssociations">
-<setupvalid><link topic="yesnonotes"><tt>yes</tt> or <tt>no</tt></link></setupvalid>
+<setupvalid><link topic="yesnonotes"><tt>yes</tt> or <tt>no</tt></link>, or a <link topic="scriptexpression">boolean expression</link></setupvalid>
 <setupdefault><tt>no</tt></setupdefault>
 <body>
-<p>When set to <tt>yes</tt>, Setup will tell Explorer to refresh its file associations information at the end of the installation, and Uninstall will do the same at the end of uninstallation.</p>
+<p>When set to <tt>yes</tt> or to a <link topic="scriptexpression">boolean expression</link> evaluating to <tt>True</tt>, Setup will tell Explorer to refresh its file associations information at the end of the installation, and Uninstall will do the same at the end of uninstallation.</p>
 <p>If your installation creates a file association but doesn't have <tt>ChangesAssociations</tt> set to <tt>yes</tt>, the correct icon for the file type likely won't be displayed until the user logs off or restarts the computer.</p>
 </body>
 </setuptopic>
 
 <setuptopic directive="ChangesEnvironment">
-<setupvalid><link topic="yesnonotes"><tt>yes</tt> or <tt>no</tt></link></setupvalid>
+<setupvalid><link topic="yesnonotes"><tt>yes</tt> or <tt>no</tt></link>, or a <link topic="scriptexpression">boolean expression</link></setupvalid>
 <setupdefault><tt>no</tt></setupdefault>
 <body>
-<p>When set to <tt>yes</tt>, at the end of the installation Setup will notify other running applications (notably Windows Explorer) that they should reload their environment variables from the registry.</p>
+<p>When set to <tt>yes</tt> or to a <link topic="scriptexpression">boolean expression</link> evaluating to <tt>True</tt>, at the end of the installation Setup will notify other running applications (notably Windows Explorer) that they should reload their environment variables from the registry.</p>
 <p>If your installation creates or changes an environment variable but doesn't have <tt>ChangesEnvironment</tt> set to <tt>yes</tt>, the new/changed environment variable will not be seen by applications launched from Explorer until the user logs off or restarts the computer.</p>
 </body>
 </setuptopic>
@@ -4452,7 +4474,7 @@ DiskSliceSize=1457664
 <setuptopic directive="WizardImageFile">
 <setupdefault><tt>compiler:WIZMODERNIMAGE.BMP</tt></setupdefault>
 <body>
-<p>Specifies the name(s) of the bitmap file(s) to display on the left side of the wizard. The files(s) must be located in your installation's <link topic="sourcedirectorynotes">source directory</link> when running the Setup Compiler, unless a fully qualified pathname is specified or the pathname is prefixed by "compiler:", in which case it looks for the file in the Compiler directory.</p>
+<p>Specifies the name(s) of the bitmap file(s) to display on the left side of the wizard. Wildcards are supported and the files(s) must be located in your installation's <link topic="sourcedirectorynotes">source directory</link> when running the Setup Compiler, unless a fully qualified pathname is specified or the pathname is prefixed by "compiler:", in which case it looks for the file in the Compiler directory.</p>
 <p>256-color bitmaps may not display correctly in 256-color mode, since it does not handle palettes.</p>
 <p>When multiple files are specified, Setup will automatically select the one which best matches the system's DPI setting. The recommended size of the bitmap per DPI setting is:</p>
 <table>
@@ -4475,7 +4497,7 @@ DiskSliceSize=1457664
 <setuptopic directive="WizardSmallImageFile">
 <setupdefault><tt>compiler:WIZMODERNSMALLIMAGE.BMP</tt></setupdefault>
 <body>
-<p>Specifies the name(s) of the bitmap file(s) to display in the upper right corner of the wizard. The file(s) must be located in your installation's <link topic="sourcedirectorynotes">source directory</link> when running the Setup Compiler, unless a fully qualified pathname is specified or the pathname is prefixed by "compiler:", in which case it looks for the file in the Compiler directory.</p>
+<p>Specifies the name(s) of the bitmap file(s) to display in the upper right corner of the wizard. Wildcards are supported and the file(s) must be located in your installation's <link topic="sourcedirectorynotes">source directory</link> when running the Setup Compiler, unless a fully qualified pathname is specified or the pathname is prefixed by "compiler:", in which case it looks for the file in the Compiler directory.</p>
 <p>256-color bitmaps may not display correctly in 256-color mode, since it does not handle palettes.</p>
 <p>When multiple files are specified, Setup will automatically select the one which best matches the system's DPI setting. The recommended size of the bitmap per DPI setting is:</p>
 <table>
@@ -4735,6 +4757,13 @@ DiskSliceSize=1457664
 </body>
 </setuptopic>
 
+<setuptopic directive="VersionInfoOriginalFileName">
+<body>
+<p>Specifies the original file name value for the Setup version info.</p>
+<p>This setting has no effect if <tt>UseSetupLdr</tt> is set to <tt>no</tt>.</p>
+</body>
+</setuptopic>
+
 <setuptopic directive="VersionInfoProductName">
 <setupdefault><link topic="setup_appname">AppName</link> if <link topic="setup_appname">AppName</link> doesn't include constants, an empty string otherwise</setupdefault>
 <body>
@@ -4880,12 +4909,12 @@ DiskSliceSize=1457664
 <setupvalid>One or more of the following, separated by spaces: <br/><tt>x64</tt> <br/><tt>ia64</tt></setupvalid>
 <setupdefault><i>(blank)</i></setupdefault>
 <body>
-<p>Specifies the 64-bit processor architecture(s) on which Setup should install in <link topic="32vs64bitinstalls">64-bit mode</link>. If this directive is not specified or is blank, Setup will always install in <link topic="32vs64bitinstalls">32-bit mode</link>.</p>
+<p>Specifies the 64-bit processor architecture(s) on which Setup should install in <link topic="32vs64bitinstalls">64-bit install mode</link>. If this directive is not specified or is blank, Setup will always install in <link topic="32vs64bitinstalls">32-bit install mode</link>.</p>
 <p>Normally, you should not change this directive from its default value unless your application contains native 64-bit binaries.</p>
 <p>Be sure you have read the <link topic="64bitlimitations">64-bit Installation Limitations</link> topic before setting this directive.</p>
 <p>If your application runs only on 64-bit processor architectures, you should set <link topic="setup_architecturesallowed">ArchitecturesAllowed</link> to the same value as this directive to prevent Setup from running on 32-bit Windows.</p>
-<p>Setup can only run in 64-bit mode on versions of Windows that provide the API support Inno Setup requires (e.g. RegDeleteKeyEx). All x64 editions provide the necessary APIs, however Itanium editions prior to Windows Server 2003 SP1 do not. If the user is running an older Itanium version of Windows, Setup will display a message (<tt>MissingWOW64APIs</tt>) recommending that the user install a service pack, and exit.</p>
-<p><i>Note:</i> Windows 10 on ARM64 only supports 32-bit (x86) binaries. Therefore Setup will never install in <link topic="32vs64bitinstalls">64-bit mode</link> on Windows 10 on ARM64.</p>
+<p>Setup can only run in 64-bit install mode on versions of Windows that provide the API support Inno Setup requires (e.g. RegDeleteKeyEx). All x64 editions provide the necessary APIs, however Itanium editions prior to Windows Server 2003 SP1 do not. If the user is running an older Itanium version of Windows, Setup will display a message (<tt>MissingWOW64APIs</tt>) recommending that the user install a service pack, and exit.</p>
+<p><i>Note:</i> Windows 10 on ARM64 only supports 32-bit (x86) binaries. Therefore Setup will never install in <link topic="32vs64bitinstalls">64-bit install mode</link> on Windows 10 on ARM64.</p>
 <p><b>See also:</b><br/>
 <link topic="setup_architecturesallowed">ArchitecturesAllowed</link></p>
 </body>
@@ -4937,7 +4966,7 @@ DiskSliceSize=1457664
 <setupvalid><link topic="yesnonotes"><tt>yes</tt> or <tt>no</tt></link></setupvalid>
 <setupdefault><tt>yes</tt> if a <link topic="setup_signtool">SignTool</link> is set, <tt>no</tt> otherwise</setupdefault>
 <body>
-<p>Specifies whether the uninstaller program (unins???.exe) should be deployed with a digital signature attached. When the uninstaller has a valid digital signature, Windows Vista users will not see an "unidentified program" warning when launching it from outside of Control Panel.</p>
+<p>Specifies whether the uninstaller program (unins???.exe) should be deployed with a digital signature attached. When the uninstaller has a valid digital signature, users will not see an "unknown publisher" warning when launching it.</p>
 <p>The first time you compile a script with this directive set to <tt>yes</tt>, a uniquely-named copy of the uninstaller EXE file will be created in the directory specified by the <link topic="setup_signeduninstallerdir">SignedUninstallerDir</link> directive (which defaults to the <link topic="setup_outputdir">output directory</link>). Depending on the <link topic="setup_signtool">SignTool</link> setting, you will either then be prompted to attach a digital signature to this file using an external code-signing tool (such as Microsoft's signtool.exe) or the file will be automatically signed on the fly. On subsequent compiles, the signature from the file will be embedded into the compiled installations' uninstallers.</p>
 <p>Upgrading to a newer version of Inno Setup, or changing certain [Setup] section directives that affect the contents of the uninstaller EXE file (such as <link topic="setup_setupiconfile">SetupIconFile</link>), will cause a new file to be created under a different name.</p>
 <p>If a file generated by this directive is deleted, it will be recreated automatically if necessary on the next compile.</p>
@@ -4972,7 +5001,7 @@ DiskSliceSize=1457664
 <p>When Setup has a valid digital signature, users will not see an "unidentified program" warning when launching it.</p>
 <p>The specified Sign Tool name and its command have to be defined in the compiler IDE (via the <i>Tools | Configure Sign Tools...</i> menu) or on the <link topic="compilercmdline">compiler command line</link> (via the "/S" parameter), else an error will occur.</p>
 <p>The following special sequences may be used in Sign Tool parameters and commands:</p>
-<p><tt>$f</tt>, replaced by the quoted file name of the file to be signed.</p>
+<p><tt>$f</tt>, replaced by the quoted file name of the file to be signed. (required)</p>
 <p><tt>$p</tt>, replaced by the Sign Tool parameters.</p>
 <p><tt>$q</tt>, replaced by a quote, useful for defining a Sign Tool which contains quotes from the command line.</p>
 <p><tt>$$</tt>, replaced by a single <tt>$</tt> character.</p>
@@ -5204,7 +5233,7 @@ SignTool=byparam format c:
 <topic name="sameappnotes" title="Same Application">
 <keyword value="Same Application" />
 <body>
-<p>"Same application" refers to two separate installations that share the same <link topic="setup_appid">AppId</link> setting (or if <tt>AppId</tt> is not set, the same <link topic="setup_appname">AppName</link> setting), and the same <link topic="32vs64bitinstalls">install mode</link> (32-bit or 64-bit).</p>
+<p>"Same application" refers to two separate installations that share the same <link topic="setup_appid">AppId</link> setting (or if <tt>AppId</tt> is not set, the same <link topic="setup_appname">AppName</link> setting), and the same <link topic="32vs64bitinstalls">32-bit or 64-bit install mode</link>.</p>
 </body>
 </topic>
 
@@ -5265,7 +5294,6 @@ SignTool=byparam format c:
 <tr><td><tt>admins</tt></td><td>Built-in Administrators group</td></tr>
 <tr><td><tt>authusers</tt></td><td>Authenticated Users group</td></tr>
 <tr><td><tt>everyone</tt></td><td>Everyone group</td></tr>
-<tr><td><tt>powerusers</tt></td><td>Built-in Power Users group</td></tr>
 <tr><td><tt>system</tt></td><td>Local SYSTEM user</td></tr>
 <tr><td><tt>users</tt></td><td>Built-in Users group</td></tr>
 </table>

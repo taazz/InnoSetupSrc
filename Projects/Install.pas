@@ -13,7 +13,8 @@ interface
 
 {$I VERSION.INC}
 
-procedure PerformInstall(var Succeeded: Boolean);
+procedure PerformInstall(var Succeeded: Boolean; const ChangesEnvironment,
+  ChangesAssociations: Boolean);
 
 procedure ExtractTemporaryFile(const BaseName: String);
 function ExtractTemporaryFiles(const Pattern: String): Integer;
@@ -307,7 +308,8 @@ begin
       Result := PathExtractName(Result);
 end;
 
-procedure PerformInstall(var Succeeded: Boolean);
+procedure PerformInstall(var Succeeded: Boolean; const ChangesEnvironment,
+  ChangesAssociations: Boolean);
 type
   PRegisterFilesListRec = ^TRegisterFilesListRec;
   TRegisterFilesListRec = record
@@ -515,18 +517,24 @@ var
     else
       RootKey := HKEY_CURRENT_USER;
     SubkeyName := NEWREGSTR_PATH_UNINSTALL + '\' + UninstallRegKeyBaseName + '_is1';
+ 
+    Log('Deleting any uninstall keys left over from previous installs');
 
-    { Delete any uninstall keys left over from previous installs }
     RegDeleteKeyIncludingSubkeys(InstallDefaultRegView, HKEY_CURRENT_USER, PChar(SubkeyName));
     if IsAdmin then
       RegDeleteKeyIncludingSubkeys(InstallDefaultRegView, HKEY_LOCAL_MACHINE, PChar(SubkeyName));
+
+    LogFmt('Creating new uninstall key: %s\%s', [GetRegRootKeyName(RootKey), SubkeyName]);
 
     { Create uninstall key }
     ErrorCode := RegCreateKeyExView(InstallDefaultRegView, RootKey, PChar(SubkeyName),
       0, nil, REG_OPTION_NON_VOLATILE, KEY_SET_VALUE, nil, H2, nil);
     if ErrorCode <> ERROR_SUCCESS then
       RegError(reRegCreateKeyEx, RootKey, SubkeyName, ErrorCode);
+ 
     try
+      Log('Writing uninstall key values.');
+    
       { do not localize or change any of the following strings }
       SetStringValue(H2, 'Inno Setup: Setup Version', SetupVersion);
       if shCreateAppDir in SetupHeader.Options then
@@ -586,7 +594,7 @@ var
       SetDWordValue(H2, 'NoRepair', 1);
       SetStringValue(H2, 'InstallDate', GetInstallDateString);
       if ExtractMajorMinorVersion(ExpandConst(SetupHeader.AppVersion), MajorVersion, MinorVersion) then begin
-        { Originally MSDN say to write to Major/MinorVersion, now it says to write to VersionMajor/Minor. So write to both. }
+        { Originally MSDN said to write to Major/MinorVersion, now it says to write to VersionMajor/Minor. So write to both. }
         SetDWordValue(H2, 'MajorVersion', MajorVersion);
         SetDWordValue(H2, 'MinorVersion', MinorVersion);
         SetDWordValue(H2, 'VersionMajor', MajorVersion);
@@ -2118,7 +2126,7 @@ var
           NotifyBeforeInstallEntry(BeforeInstall);
           Log('-- Registry entry --');
           S := ExpandConst(Subkey);
-          LogFmt('Key: %s\%s', [GetRegRootKeyName(RootKey), Subkey]); {LOG rootkey}
+          LogFmt('Key: %s\%s', [GetRegRootKeyName(RootKey), Subkey]);
           N := ExpandConst(ValueName);
           if N <> '' then
             LogFmt('Value name: %s', [N]);
@@ -2203,6 +2211,7 @@ var
                     { We're not creating a value, and we're not just deleting a
                       value (that was checked above), so there is no reason to
                       even open the key }
+                    Log('Not creating the key or a value, skipping the key and only updating uninstall log.');
                     ErrorCode := ERROR_FILE_NOT_FOUND;
                   end;
                 end;
@@ -2758,6 +2767,7 @@ var
       replacing an existing uninstall EXE, exit. }
     if UninstallTempExeFilename = '' then
       Exit;
+    Log('Renaming uninstaller.');
     RetriesLeft := 4;
     while True do begin
       Timer.Start(1000);
@@ -2768,6 +2778,8 @@ var
       if (LastError = ERROR_ACCESS_DENIED) or
          (LastError = ERROR_SHARING_VIOLATION) then begin
         if RetriesLeft > 0 then begin
+          LogFmt('The existing file appears to be in use (%d). ' +
+            'Retrying.', [LastError]);
           Dec(RetriesLeft);
           Timer.SleepUntilExpired;
           ProcessEvents;
@@ -2799,6 +2811,7 @@ var
       do nothing }
     if (UninstallExeCreated <> ueNone) and
        ((shSignedUninstaller in SetupHeader.Options) or DetachedUninstMsgFile) then begin
+      LogFmt('Writing uninstaller messages: %s', [UninstallMsgFilename]);
       F := TFile.Create(UninstallMsgFilename, fdCreateAlways, faWrite, fsNone);
       try
         if UninstallExeCreated = ueNew then
@@ -2936,7 +2949,7 @@ begin
       Include(UninstLog.Flags, ufModernStyle);
       if shUninstallRestartComputer in SetupHeader.Options then
         Include(UninstLog.Flags, ufAlwaysRestart);
-      if shChangesEnvironment in SetupHeader.Options then
+      if ChangesEnvironment then
         Include(UninstLog.Flags, ufChangesEnvironment);
       RecordStartInstall;
       RecordCompiledCode;
@@ -2967,7 +2980,7 @@ begin
 
       if ExpandedAppMutex <> '' then
         UninstLog.Add(utMutexCheck, [ExpandedAppMutex], 0);
-      if shChangesAssociations in SetupHeader.Options then
+      if ChangesAssociations then
         UninstLog.Add(utRefreshFileAssoc, [''], 0);
 
       { Record UninstallDelete entries, if any }
@@ -3031,6 +3044,7 @@ begin
         modifications you want to add must be done before this is called. }
       if Uninstallable then begin
         SetStatusLabelText(SetupMessages[msgStatusSavingUninstall]);
+        Log('Saving uninstall information.');
         RenameUninstallExe;
         CreateUninstallMsgFile;
         { Register uninstall information so the program can be uninstalled

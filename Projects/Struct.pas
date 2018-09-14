@@ -2,7 +2,7 @@ unit Struct;
 
 {
   Inno Setup
-  Copyright (C) 1997-2010 Jordan Russell
+  Copyright (C) 1997-2018 Jordan Russell
   Portions by Martijn Laan
   For conditions of distribution and use, see LICENSE.TXT.
 
@@ -17,8 +17,8 @@ uses
 
 const
   SetupTitle = 'Inno Setup';
-  SetupVersion = '5.6.0 '{$IFDEF UNICODE}+'(u)'{$ELSE}+'(a)'{$ENDIF};
-  SetupBinVersion = (5 shl 24) + (6 shl 16) + (0 shl 8) + 0;
+  SetupVersion = '5.6.1 '{$IFDEF UNICODE}+'(u)'{$ELSE}+'(a)'{$ENDIF};
+  SetupBinVersion = (5 shl 24) + (6 shl 16) + (1 shl 8) + 0;
 
 type
   TSetupID = array[0..63] of AnsiChar;
@@ -29,14 +29,14 @@ type
   TDiskSliceID = array[1..8] of AnsiChar;
 const
   { SetupID is used by the Setup program to check if the SETUP.0 file is
-    compatible with with it. If you make any modifications to the records in
+    compatible with it. If you make any modifications to the records in
     this file it's recommended you change SetupID. Any change will do (like
     changing the letters or numbers), as long as your format is
     unrecognizable by the standard Inno Setup. }
-  SetupID: TSetupID = 'Inno Setup Setup Data (5.5.7)'{$IFDEF UNICODE}+' (u)'{$ENDIF};
+  SetupID: TSetupID = 'Inno Setup Setup Data (5.6.2)'{$IFDEF UNICODE}+' (u)'{$ENDIF};
   UninstallLogID: array[Boolean] of TUninstallLogID =
     ('Inno Setup Uninstall Log (b)', 'Inno Setup Uninstall Log (b) 64-bit');
-  MessagesHdrID: TMessagesHdrID = 'Inno Setup Messages (5.5.3)'{$IFDEF UNICODE}+' (u)'{$ENDIF};
+  MessagesHdrID: TMessagesHdrID = 'Inno Setup Messages (5.6.2)'{$IFDEF UNICODE}+' (u)'{$ENDIF};
   MessagesLangOptionsID: TMessagesLangOptionsID = '!mlo!001';
   ZLIBID: TCompID = 'zlb'#26;
   DiskSliceID: TDiskSliceID = 'idska32'#26;
@@ -53,8 +53,7 @@ type
     shAllowNoIcons, shAlwaysRestart, shAlwaysUsePersonalGroup,
     shWindowVisible, shWindowShowCaption, shWindowResizable,
     shWindowStartMaximized, shEnableDirDoesntExistWarning,
-    shPassword, shAllowRootDirectory, shDisableFinishedPage,
-    shChangesAssociations, shUsePreviousAppDir,
+    shPassword, shAllowRootDirectory, shDisableFinishedPage, shUsePreviousAppDir,
     shBackColorHorizontal, shUsePreviousGroup, shUpdateUninstallLogAppName,
     shUsePreviousSetupType, shDisableReadyMemo, shAlwaysShowComponentsList,
     shFlatComponentsList, shShowComponentSizes, shUsePreviousTasks,
@@ -62,7 +61,7 @@ type
     shAllowUNCPath, shUserInfoPage, shUsePreviousUserInfo,
     shUninstallRestartComputer, shRestartIfNeededByRun, shShowTasksTreeLines,
     shAllowCancelDuringInstall, shWizardImageStretch, shAppendDefaultDirName,
-    shAppendDefaultGroupName, shEncryptionUsed, shChangesEnvironment,
+    shAppendDefaultGroupName, shEncryptionUsed,
     {$IFNDEF UNICODE}shShowUndisplayableLanguages, {$ENDIF}shSetupLogging,
     shSignedUninstaller, shUsePreviousLanguage, shDisableWelcomePage,
     shCloseApplications, shRestartApplications, shAllowNetworkDrive,
@@ -78,7 +77,7 @@ const
     ('Unknown', 'x86', 'x64', 'Itanium', 'ARM64');
 
 const
-  SetupHeaderStrings = 28;
+  SetupHeaderStrings = 30;
   SetupHeaderAnsiStrings = 4;
 type
   TSetupHeader = packed record
@@ -87,8 +86,8 @@ type
       DefaultGroupName, BaseFilename, UninstallFilesDir, UninstallDisplayName,
       UninstallDisplayIcon, AppMutex, DefaultUserInfoName, DefaultUserInfoOrg,
       DefaultUserInfoSerial, AppReadmeFile, AppContact, AppComments,
-      AppModifyPath, CreateUninstallRegKey, Uninstallable,
-      CloseApplicationsFilter, SetupMutex: String;
+      AppModifyPath, CreateUninstallRegKey, Uninstallable, CloseApplicationsFilter,
+      SetupMutex, ChangesEnvironment, ChangesAssociations: String;
     LicenseText, InfoBeforeText, InfoAfterText, CompiledCodeText: AnsiString;
 {$IFNDEF UNICODE}
     LeadBytes: set of AnsiChar;

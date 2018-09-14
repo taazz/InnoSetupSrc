@@ -134,8 +134,8 @@ const
   SCompilerStatusSigningSetup = '   Signing Setup program executable';
   SCompilerStatusSigningSourceFile = '   Signing: %s';
   SCompilerStatusSourceFileAlreadySigned = '   Skipping signing, already signed: %s';
-  SCompilerStatusSigning = '   Running Sign Tool command: %s';
-  SCompilerStatusSigningWithDelay = '   Running Sign Tool command in %d milliseconds: %s';
+  SCompilerStatusSigning = '   Running Sign Tool %s: %s';
+  SCompilerStatusSigningWithDelay = '   Running Sign Tool %s in %d milliseconds: %s';
   SCompilerStatusWillRetrySigning = '   Sign Tool command failed (%s). Will retry (%d tries left).';
 
   SCompilerSuccessfulMessage2 = 'The setup images were successfully created ' +
@@ -187,7 +187,7 @@ const
   SCompilerMustNotUsePreviousLanguage = 'UsePreviousLanguage must be set to "no" when AppId includes constants';
   SCompilerDirectiveNotUsingDefault = 'The [Setup] section directive "%s" is not assuming a default value because %s includes constants.';
   SCompilerDirectiveNotUsingPreferredDefault = 'The [Setup] section directive "%s" is defaulting to %s because %s includes constants.';
-  SCompilerDirectiveCloseApplicationsFilterTooLong = 'The [Setup] section directive "CloseApplicationsFilter" contains a pattern that is too long';
+  SCompilerDirectivePatternTooLong = 'The [Setup] section directive "%s" contains a pattern that is too long';
   SCompilerOutputBaseFileNameSetup = 'Setting the [Setup] section "OutputBaseFileName" to "setup" is not recommended, all executables named "setup.exe" are shimmed by Windows application compatibility to load additional DLLs, such as version.dll.' + ' These DLLs are loaded unsafely by Windows and can be hijacked. Use a different name, for example "mysetup".';
 
   { Signing }
@@ -204,10 +204,11 @@ const
     SNewLine2 + '%s' + SNewLine2 + 'differ unexpectedly from the original ' +
     'file';
   SCompilerNoSetupLdrSignError = 'The SignTool and SignedUninstaller directives may not be set when UseSetupLdr is set to "no"';
-  SCompilerSignToolCreateProcessFailed = 'Failed to execute Sign Tool.' +
+  SCompilerSignToolFileNameSequenceNotFound = 'Unable to run Sign Tool %s: $f sequence is missing.'; 
+  SCompilerSignToolCreateProcessFailed = 'Failed to execute Sign Tool command.' +
     SNewLine2 + 'Error %d: %s'; 
-  SCompilerSignToolNonZeroExitCode = 'Sign Tool failed with exit code 0x%x';
-  SCompilerSignToolSucceededButNoSignature = 'The Sign Tool returned an ' +
+  SCompilerSignToolNonZeroExitCode = 'Sign Tool command failed with exit code 0x%x';
+  SCompilerSignToolSucceededButNoSignature = 'The Sign Tool command returned an ' +
     'exit code of 0, but the file does not have a digital signature';
 
   { Line parsing }
@@ -240,6 +241,11 @@ const
   SCompilerBadDriveConst = 'Invalid drive constant "%s"';
   SCompilerBadCustomMessageConst = 'Invalid custom message constant "%s"';
   SCompilerBadBoolConst = 'Invalid boolean constant "%s"';
+  
+  { Area checks }
+  SCompilerUsedUserAreasWarning = 'The [%s] section directive "%s" is set to "%s" but per-user areas (%s) are used by the script. ' +
+    'Regardless of the version of Windows, if the installation is administrative then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. ' +
+    'See the help file for more information.';
 
   { Directive parsing }
   SCompilerDirectiveNameMissing = 'Missing directive name';

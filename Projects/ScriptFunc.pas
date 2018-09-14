@@ -54,7 +54,7 @@ const
   );
 
    { CmnFunc2 }
-  CmnFunc2Table: array [0..55] of AnsiString =
+  CmnFunc2Table: array [0..57] of AnsiString =
   (
     'function FileExists(const Name: String): Boolean;',
     'function DirExists(const Name: String): Boolean;',
@@ -113,7 +113,9 @@ const
     'function GetUILanguage: Integer;',
     'function AddPeriod(const S: String): String;',
     'function CharLength(const S: String; const Index: Integer): Integer;',
-    'function SetNTFSCompression(const FileOrDir: String; Compress: Boolean): Boolean;'
+    'function SetNTFSCompression(const FileOrDir: String; Compress: Boolean): Boolean;',
+    'function IsWildcard(const Pattern: String): Boolean;',
+    'function WildcardMatch(const Text, Pattern: String): Boolean;'
   );
 
   { Install }
@@ -224,7 +226,7 @@ const
   );
 
   { SysUtils }
-  SysUtilsTable: array [0..23] of AnsiString =
+  SysUtilsTable: array [0..25] of AnsiString =
   (
     'procedure Beep;',
     'function Trim(const S: string): string;',
@@ -248,6 +250,8 @@ const
     'function RemoveDir(const Dir: string): Boolean;',
     'function CompareStr(const S1, S2: string): Integer;',
     'function CompareText(const S1, S2: string): Integer;',
+    'function SameStr(const S1, S2: string): Boolean;',
+    'function SameText(const S1, S2: string): Boolean;',
     'function GetDateTimeString(const DateTimeFormat: String; const DateSeparator, TimeSeparator: Char): String;',
     'function SysErrorMessage(ErrorCode: Integer): String;'
   );

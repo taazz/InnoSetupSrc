@@ -230,6 +230,7 @@ type
     ssUninstallLogMode,
     ssUninstallRestartComputer,
     ssUninstallStyle,
+    ssUsedUserAreasWarning,
     ssUsePreviousAppDir,
     ssUsePreviousGroup,
     ssUsePreviousLanguage,
@@ -241,6 +242,7 @@ type
     ssVersionInfoCompany,
     ssVersionInfoCopyright,
     ssVersionInfoDescription,
+    ssVersionInfoOriginalFileName,
     ssVersionInfoProductName,
     ssVersionInfoProductVersion,
     ssVersionInfoProductTextVersion,
@@ -935,7 +937,7 @@ var
   S: TScintRawString;
   StartIndex, I: Integer;
   C: AnsiChar;
-  NeedIspp: Boolean;
+  NeedIspp, ForDirectiveExpressionsNext: Boolean;
 begin
   StartIndex := CurIndex;
   if InlineDirective then begin
@@ -943,34 +945,34 @@ begin
     NeedIspp := True;
   end else
     NeedIspp := False; { Might be updated later to True later }
+  ForDirectiveExpressionsNext := False;
+  ConsumeChar('#');
+  CommitStyle(stCompilerDirective);
 
-  if ConsumeChar('#') then begin
-    CommitStyle(stCompilerDirective);
-
-    { Directive name or shorthand }
-    SkipWhiteSpace;
-    if ConsumeCharIn(ISPPDirectiveShorthands) then begin
-      NeedIspp := True;
-      FinishDirectiveNameOrShorthand(True); { All shorthands require a parameter }
-    end
-    else begin
-      S := ConsumeString(ISPPIdentChars);
-      for I := Low(ISPPDirectives) to High(ISPPDirectives) do
-        if SameRawText(S, ISPPDirectives[I].Name) then begin
-          NeedIspp := not SameRawText(S, 'include'); { Built-in preprocessor only supports '#include' }
-          Inc(OpenCount, ISPPDirectives[I].OpenCountChange);
-          if OpenCount < 0 then begin
-            CommitStyleSq(stCompilerDirective, True);
-            OpenCount := 0; { Reset so that next doesn't automatically gets error as well }
-          end;
-          FinishDirectiveNameOrShorthand(ISPPDirectives[I].RequiresParameter);
-          Break;
+  { Directive name or shorthand }
+  SkipWhiteSpace;
+  if ConsumeCharIn(ISPPDirectiveShorthands) then begin
+    NeedIspp := True;
+    FinishDirectiveNameOrShorthand(True); { All shorthands require a parameter }
+  end
+  else begin
+    S := ConsumeString(ISPPIdentChars);
+    for I := Low(ISPPDirectives) to High(ISPPDirectives) do
+      if SameRawText(S, ISPPDirectives[I].Name) then begin
+        NeedIspp := not SameRawText(S, 'include'); { Built-in preprocessor only supports '#include' }
+        ForDirectiveExpressionsNext := SameRawText(S, 'for'); { #for uses ';' as an expressions list separator so we need to remember that ';' doesn't start a comment until the list is done }
+        Inc(OpenCount, ISPPDirectives[I].OpenCountChange);
+        if OpenCount < 0 then begin
+          CommitStyleSq(stCompilerDirective, True);
+          OpenCount := 0; { Reset so that next doesn't automatically gets error as well }
         end;
-      if InlineDirective then
-        CommitStyle(stDefault) { #emit shorthand was used (='#' directly followed by an expression): not an error }
-      else
-        CommitStyleSqPending(stCompilerDirective);
-    end;
+        FinishDirectiveNameOrShorthand(ISPPDirectives[I].RequiresParameter);
+        Break;
+      end;
+    if InlineDirective then
+      CommitStyle(stDefault) { #emit shorthand was used (='#' directly followed by an expression): not an error }
+    else
+      CommitStyleSqPending(stCompilerDirective);
   end;
 
   { Rest of the directive }
@@ -1009,6 +1011,8 @@ begin
         '?', ':', ',', '.', '~', '(', '[', '{', ')', ']', '}', '@',
         '#':
           begin
+            if (C = '}') and ForDirectiveExpressionsNext then
+              ForDirectiveExpressionsNext := False;
             if (C = '/') and ConsumeChar('*') then
               FinishConsumingStarComment
             else if InlineDirective and (C = '}') then
@@ -1018,11 +1022,15 @@ begin
           end;
         ';':
           begin
-            if not InlineDirective then
-              ConsumeAllRemaining
-            else
-              ConsumeCharsNot(['}']);
-            CommitStyle(stComment);
+            if ForDirectiveExpressionsNext then
+              CommitStyle(stSymbol)
+            else begin
+              if not InlineDirective then
+                ConsumeAllRemaining
+              else
+                ConsumeCharsNot(['}']);
+              CommitStyle(stComment);
+            end;
           end;
         '''', '"':
           begin
@@ -1384,9 +1392,8 @@ begin
     Section := scNone;
     SquigglifyUntilChars([], stDefault);
   end
-  else if CurCharIs('#') or (NewLineState.OpenCompilerDirectivesCount > 0) then begin
-    HandleCompilerDirective(False, -1, NewLineState.OpenCompilerDirectivesCount);
-  end
+  else if CurCharIs('#') then
+    HandleCompilerDirective(False, -1, NewLineState.OpenCompilerDirectivesCount)
   else begin
     case Section of
       scUnknown: ;
